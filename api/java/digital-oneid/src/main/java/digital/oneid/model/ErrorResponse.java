@@ -5,27 +5,39 @@
 
 package digital.oneid.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 /**
  * Created by hubinotech on 11/03/20.
  */
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class ErrorResponse {
 
-    String error_code = "";
-    String error_message = "";
+    String errorCode = "";
+    String errorMessage = "";
+    String referenceCode = "";
 
     public String getErroCode() {
-        return error_code;
+        return errorCode;
     }
 
-    public void setErroCode(String error_code) {
-        this.error_code = error_code;
+    public void setErroCode(String errorCode) {
+        this.errorCode = errorCode;
     }
 
     public String getErroMessage() {
-        return error_message;
+        return errorMessage;
     }
 
-    public void setErroMessage(String error_message) {
-        this.error_message = error_message;
+    public void setErroMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
+    }
+
+    public String getReferenceCode() {
+        return referenceCode;
+    }
+
+    public void setReferenceCode(String referenceCode) {
+        this.referenceCode = referenceCode;
     }
 }

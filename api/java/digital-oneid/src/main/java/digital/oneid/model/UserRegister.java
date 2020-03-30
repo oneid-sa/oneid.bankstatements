@@ -1,12 +1,14 @@
 package digital.oneid.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
  * Created by hubinotech on 25/03/20.
  */
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class UserRegister {
 
     private String loginName;
@@ -20,11 +22,11 @@ public class UserRegister {
     private String password;
 
     private Name name;
-
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Address address;
-
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Preferences preferences;
-
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Session session;
 
     public void setLoginName(String loginName){

@@ -72,6 +72,14 @@ digital-oneid/
  └── pom.xml
  ```
 
+## Steps to build a project:
+
+**Install Java**
+> JDK 1.8 or later
+
+**Install Maven**
+> Maven 3.2+
+
 **Compile Source Code**
 > mvn clean compile
 

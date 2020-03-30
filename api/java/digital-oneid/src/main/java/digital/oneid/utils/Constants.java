@@ -28,5 +28,18 @@ public class Constants {
     public String LOGINNAME = "loginName";
     public String PASSWORD = "password";
     public String USER = "user";
+    public String EMAIL = "email";
+    public String NAME = "name";
+    public String FIRSTNAME = "first";
+    public String LASTNAME = "last";
+    public String ADDRESS = "address";
+    public String ADDRESS1 = "address1";
+    public String STATE = "state";
+    public String CITY = "city";
+    public String ZIP = "zip";
+    public String COUNTRY = "country";
+    public String PREFERENCES = "preferences";
+    public String CURRENCY = "currency";
+    public String LOCALE = "locale";
 
 }

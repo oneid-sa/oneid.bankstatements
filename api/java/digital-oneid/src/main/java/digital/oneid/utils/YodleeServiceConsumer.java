@@ -6,8 +6,11 @@
 
 package digital.oneid.utils;
 
+import com.google.gson.Gson;
 import digital.oneid.model.*;
 import net.minidev.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.*;
 import org.springframework.web.client.HttpStatusCodeException;
@@ -25,6 +28,8 @@ public class YodleeServiceConsumer extends Constants {
     public RestTemplate rest() {
         return new RestTemplate();
     }
+
+    private static final Logger logger = LoggerFactory.getLogger(YodleeServiceConsumer.class);
 
     /**
      * @param baseUrl
@@ -50,6 +55,7 @@ public class YodleeServiceConsumer extends Constants {
             cobrandLoginResponse.setErrorResponse(errorResponse);
             return cobrandLoginResponse;
         } catch (HttpStatusCodeException exception) {
+            logger.info("FAILED:/ysl/cobrand/login:"+exception.getMessage());
             int statusCode = exception.getStatusCode().value();
             ErrorResponse errorResponse = new ErrorResponse();
             errorResponse.setErroMessage(INVALID_LOGINPASSWORD);
@@ -70,32 +76,32 @@ public class YodleeServiceConsumer extends Constants {
      * @return
      */
     public UserRegisterResponse userRegister(String baseUrl, String apiVersion, String cobrandName, String cobrandSessionToken, UserRegisterRequest userRegisterRequest) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.add(API_VERSION, apiVersion);
-        headers.add(AUTHORIZATION, COBSESSION + cobrandSessionToken);
-        headers.add(COBRAND_NAME, cobrandName);
-        RestTemplate restTemplate = new RestTemplate();
-        HttpEntity entity = new HttpEntity(userRegisterRequest, headers);
         try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.add(API_VERSION, apiVersion);
+            headers.add(AUTHORIZATION, COBSESSION + cobrandSessionToken);
+            headers.add(COBRAND_NAME, cobrandName);
+            RestTemplate restTemplate = new RestTemplate();
+            HttpEntity entity = new HttpEntity(userRegisterRequest, headers);
             ResponseEntity<UserRegisterResponse> response = restTemplate.exchange(
                     baseUrl + "/ysl/user/register", HttpMethod.POST, entity, UserRegisterResponse.class);
             return response.getBody();
-        } catch (HttpStatusCodeException exception) {
+        }
+         catch (HttpStatusCodeException exception) {
+             logger.info("FAILED:/ysl/user/register:"+exception.getMessage());
+             Gson g = new Gson();
+             ErrorResponse errorResponse = g.fromJson(exception.getResponseBodyAsString(), ErrorResponse.class);
             int statusCode = exception.getStatusCode().value();
-            ErrorResponse errorResponse = new ErrorResponse();
             if (statusCode == 401) {
-                errorResponse.setErroMessage(INVALID_LOGINPASSWORD);
                 errorResponse.setErroCode(String.valueOf(statusCode));
             } else if (statusCode == 400) {
-                errorResponse.setErroMessage(USERNAME_EXIST + userRegisterRequest.getUser().getLoginName());
                 errorResponse.setErroCode(String.valueOf(statusCode));
             }
             UserRegisterResponse userRegisterResponse = new UserRegisterResponse();
             userRegisterResponse.setErrorResponse(errorResponse);
             return userRegisterResponse;
         }
-
     }
 
     /**
@@ -108,21 +114,26 @@ public class YodleeServiceConsumer extends Constants {
      * @return
      */
     public String createUserSessionToken(String baseUrl, String apiVersion, String cobrandName, String cobrandSessionToken, String username, String password) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.add(API_VERSION, apiVersion);
-        headers.add(AUTHORIZATION, COBSESSION + cobrandSessionToken);
-        headers.add(COBRAND_NAME, cobrandName);
-        RestTemplate restTemplate = new RestTemplate();
-        JSONObject jsonObjectUser = new JSONObject();
-        jsonObjectUser.put(LOGINNAME, username);
-        jsonObjectUser.put(PASSWORD, password);
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put(USER, jsonObjectUser);
-        HttpEntity entity = new HttpEntity(jsonObject, headers);
-        ResponseEntity<UserRegisterResponse> response = restTemplate.exchange(
-                baseUrl + "/ysl/user/login", HttpMethod.POST, entity, UserRegisterResponse.class);
-        return response.getBody().getUser().getSession().getUserSession();
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.add(API_VERSION, apiVersion);
+            headers.add(AUTHORIZATION, COBSESSION + cobrandSessionToken);
+            headers.add(COBRAND_NAME, cobrandName);
+            RestTemplate restTemplate = new RestTemplate();
+            JSONObject jsonObjectUser = new JSONObject();
+            jsonObjectUser.put(LOGINNAME, username);
+            jsonObjectUser.put(PASSWORD, password);
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put(USER, jsonObjectUser);
+            HttpEntity entity = new HttpEntity(jsonObject, headers);
+            ResponseEntity<UserRegisterResponse> response = restTemplate.exchange(
+                    baseUrl + "/ysl/user/login", HttpMethod.POST, entity, UserRegisterResponse.class);
+            return response.getBody().getUser().getSession().getUserSession();
+        } catch (HttpStatusCodeException exception) {
+            logger.info("FAILED:/ysl/user/login:"+exception.getResponseBodyAsString());
+            return exception.getResponseBodyAsString();
+        }
     }
 
 
@@ -134,7 +145,8 @@ public class YodleeServiceConsumer extends Constants {
      * @param cobrandName
      * @return AccountResponse
      */
-    public AccountResponse getAccountInformation(String baseUrl, String apiVersion, String cobrandName, String yodleeUserJwtToken) {
+    public Object getAccountInformation(String baseUrl, String apiVersion, String cobrandName, String yodleeUserJwtToken) {
+        try {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.add(API_VERSION, apiVersion);
@@ -145,6 +157,18 @@ public class YodleeServiceConsumer extends Constants {
         ResponseEntity<AccountResponse> response = restTemplate.exchange(
                 baseUrl + "/ysl/accounts?HTTP/1.1", HttpMethod.GET, entity, AccountResponse.class);
         return response.getBody();
+        } catch (HttpStatusCodeException exception) {
+            logger.info("FAILED:/ysl/accounts:"+exception.getResponseBodyAsString());
+            Gson g = new Gson();
+            ErrorResponse errorResponse = g.fromJson(exception.getResponseBodyAsString(), ErrorResponse.class);
+            int statusCode = exception.getStatusCode().value();
+            if (statusCode == 401) {
+                errorResponse.setErroCode(String.valueOf(statusCode));
+            } else if (statusCode == 400) {
+                errorResponse.setErroCode(String.valueOf(statusCode));
+            }
+            return errorResponse;
+        }
     }
 
     /**
@@ -158,9 +182,9 @@ public class YodleeServiceConsumer extends Constants {
      * @param toDate
      * @return
      */
-    public JSONObject getTransactionInfo(String baseUrl, String apiVersion, String cobrandName, String yodleeUserJwtToken,
+    public Object getTransactionInfo(String baseUrl, String apiVersion, String cobrandName, String yodleeUserJwtToken,
                                          long accountId, String container, String fromDate, String toDate) {
-
+        try {
         String params = "accountId=" + accountId + "&container=" + container + "&fromDate=" + fromDate + "&toDate=" + toDate;
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -175,6 +199,18 @@ public class YodleeServiceConsumer extends Constants {
         System.out.println(response.getStatusCode());
         System.out.println(response.getBody());
         return response.getBody();
+        } catch (HttpStatusCodeException exception) {
+            logger.info("FAILED:/ysl/transactions:"+exception.getResponseBodyAsString());
+            Gson g = new Gson();
+            ErrorResponse errorResponse = g.fromJson(exception.getResponseBodyAsString(), ErrorResponse.class);
+            int statusCode = exception.getStatusCode().value();
+            if (statusCode == 401) {
+                errorResponse.setErroCode(String.valueOf(statusCode));
+            } else if (statusCode == 400) {
+                errorResponse.setErroCode(String.valueOf(statusCode));
+            }
+            return errorResponse;
+        }
     }
 
 

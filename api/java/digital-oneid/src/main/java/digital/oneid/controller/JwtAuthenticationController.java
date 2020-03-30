@@ -6,6 +6,7 @@
 
 package digital.oneid.controller;
 
+import com.google.gson.Gson;
 import digital.oneid.model.*;
 import digital.oneid.security.JwtTokenUtil;
 import digital.oneid.service.JwtBusinessService;
@@ -21,7 +22,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.web.bind.annotation.*;
-
 /**
  * JwtAuthenticationController annotation indicates that the annotated class is a controller.
  * It is a specialization of @Component and is autodetected through classpath scanning.
@@ -102,7 +102,7 @@ public class JwtAuthenticationController extends Constants {
         String cobrandName = jwtBusinessService.getCobrandName();
         String cobrandSessionToken = jwtBusinessService.getCobrandSessionToken();
         UserRegisterResponse userRegisterResp = yodleeServiceConsumer.userRegister(baseUrl, apiVersion, cobrandName, cobrandSessionToken, userRegisterRequest);
-        if (userRegisterResp.getErrorResponse().getErroCode() != null && userRegisterResp.getErrorResponse().getErroCode().toString().contains("40")) {
+        if (userRegisterResp.getErrorResponse() != null && userRegisterResp.getErrorResponse().getErroCode().toString().contains("40")) {
             if (userRegisterResp.getErrorResponse().getErroCode().toString() == ERROR_CODE_400) {
                 return new ResponseEntity<Object>(
                         userRegisterResp.getErrorResponse(), new HttpHeaders(), HttpStatus.BAD_REQUEST);
@@ -151,8 +151,15 @@ public class JwtAuthenticationController extends Constants {
             YodleeJwtTokenGenerate tokenYodleeGenerator = new YodleeJwtTokenGenerate(args);
             String yodleeUserJwtToken = tokenYodleeGenerator.generateJwtYodlee(false, username);
             String userSessionToken = yodleeServiceConsumer.createUserSessionToken(baseUrl, apiVersion, cobrandName, cobrandSessionToken, username, password);
-            jwtBusinessService.insertUserSessionToken(userSessionToken);
-            return ResponseEntity.ok(yodleeServiceConsumer.getAccountInformation(baseUrl, apiVersion, cobrandName, yodleeUserJwtToken));
+            if(isJSONValid(userSessionToken)) {
+                Gson g = new Gson();
+                ErrorResponse errorResponse = g.fromJson(userSessionToken, ErrorResponse.class);
+                errorResponse.setErroCode(String.valueOf(400));
+                return ResponseEntity.ok(errorResponse);
+            } else {
+                jwtBusinessService.insertUserSessionToken(userSessionToken);
+                return ResponseEntity.ok(yodleeServiceConsumer.getAccountInformation(baseUrl, apiVersion, cobrandName, yodleeUserJwtToken));
+            }
         } else {
             ErrorResponse errorResponse = new ErrorResponse();
             errorResponse.setErroCode(ERROR_CODE_400);
@@ -277,4 +284,13 @@ public class JwtAuthenticationController extends Constants {
         return args;
     }
 
+    public boolean isJSONValid(String jsonInString) {
+        Gson gson = new Gson();
+        try {
+            gson.fromJson(jsonInString, Object.class);
+            return true;
+        } catch(com.google.gson.JsonSyntaxException ex) {
+            return false;
+        }
+    }
 }
