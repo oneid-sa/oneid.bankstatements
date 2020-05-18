@@ -8,49 +8,82 @@ package digital.oneid.model;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "user_registration")
+@Table(name = "user_accounts")
 public class TableUserRegistration {
 
     @Id
     @GeneratedValue
-    private int uid;
+    private int id;
     @Column
-    private String username;
+    private int companyId;
+    @Column
+    private String loginName;
+    @Column
+    private String email;
     @Column
     private String password;
     @Column
-    private int role_id;
+    private String createdAt;
+    @Column
+    private String updatedAt;
+    @Column
+    private long createdYodleeId;
 
-    public String getUsername() {
-        return username;
+    public String getLoginName() {
+        return loginName;
     }
-
-    public void setUsername(String username) {
-        this.username = username;
+    public void setLoginName(String loginName) {
+        this.loginName = loginName;
     }
 
     public String getPassword() {
         return password;
     }
-
     public void setPassword(String password) {
         this.password = password;
     }
 
-    public int getRoleID() {
-        return role_id;
+    public String getEmail() {
+        return email;
+    }
+    public void setEmail(String email) {
+        this.email = email;
     }
 
-    public void setRoleID(int role_id) {
-        this.role_id = role_id;
+
+    public int getId() {
+        return id;
+    }
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public long getCreatedYodleeId() {
+        return createdYodleeId;
+    }
+    public void setCreatedYodleeId(long createdYodleeId) {
+        this.createdYodleeId = createdYodleeId;
+    }
+
+    public int getCompanyId() {
+        return companyId;
+    }
+    public void setCompanyId(int companyId) {
+        this.companyId = companyId;
     }
 
 
-    public int getUserID() {
-        return uid;
+    public String getCreatedAt() {
+        return createdAt;
+    }
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
     }
 
-    public void setUserID(int uid) {
-        this.uid = uid;
+    public String getUpdatedAt() {
+        return updatedAt;
+    }
+    public void setUpdatedAt(String updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }

@@ -57,7 +57,7 @@ public class YodleeJwtTokenGenerate {
         }
 
         String encodedJWT = JWT.getEncoder().encode(jwt, signer);
-
+        System.out.println(encodedJWT);
         return encodedJWT;
     }
 

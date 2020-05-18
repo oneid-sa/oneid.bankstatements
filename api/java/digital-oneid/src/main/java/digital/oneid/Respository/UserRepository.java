@@ -23,19 +23,23 @@ import java.util.List;
 @Repository
 public interface UserRepository extends JpaRepository<TableUserRegistration, Integer> {
 
-    TableUserRegistration findByUsername(String username);
+    TableUserRegistration findByLoginName(String username);
 
-    @Query(value = "SELECT uid FROM user_registration WHERE username=?1", nativeQuery = true)
+    @Query(value = "SELECT id FROM user_accounts WHERE login_name=?1", nativeQuery = true)
     int GetUserId(String username);
 
 
-    @Query(value = "SELECT username FROM user_registration WHERE role_id=?1", nativeQuery = true)
+    @Query(value = "SELECT login_name FROM user_accounts WHERE role_id=?1", nativeQuery = true)
     List<String> GetUserList(int role);
 
-    @Query(value = "SELECT password FROM user_registration WHERE username=?1", nativeQuery = true)
+    @Query(value = "SELECT password FROM user_accounts WHERE login_name=?1", nativeQuery = true)
     String GetPassword(String username);
 
-    @Query(value = "SELECT uid FROM user_registration WHERE username=?1", nativeQuery = true)
+    @Query(value = "SELECT id FROM user_accounts WHERE login_name=?1", nativeQuery = true)
     String GetUidFromUserName(String username);
+
+    List<TableUserRegistration> findByCompanyId(int companyId);
+
+    TableUserRegistration findByCompanyIdAndLoginName(int companyID, String username);
 }
 

@@ -5,7 +5,10 @@
 
 package digital.oneid.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.util.List;
 
 /**
  * Created by hubinotech on 12/03/20.
@@ -48,6 +51,20 @@ public class GetAccountInfo
     private int id;
 
     private String providerName;
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    private int interestRate;
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    private String displayedName;
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    private List<Dataset> dataset;
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    private List<Holder> holder;
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    private AutoRefresh autoRefresh;
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    private AvailableBalance availableBalance;
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    private CurrentBalance currentBalance;
 
     public void setIncludeInNetWorth(boolean includeInNetWorth){
         this.includeInNetWorth = includeInNetWorth;
@@ -158,5 +175,47 @@ public class GetAccountInfo
     }
     public String getProviderName(){
         return this.providerName;
+    }
+    public void setAutoRefresh(AutoRefresh autoRefresh){
+        this.autoRefresh = autoRefresh;
+    }
+    public AutoRefresh getAutoRefresh(){
+        return this.autoRefresh;
+    }
+    public void setHolder(List<Holder> holder){
+        this.holder = holder;
+    }
+    public List<Holder> getHolder(){
+        return this.holder;
+    }
+    public void setAvailableBalance(AvailableBalance availableBalance){
+        this.availableBalance = availableBalance;
+    }
+    public AvailableBalance getAvailableBalance(){
+        return this.availableBalance;
+    }
+    public void setCurrentBalance(CurrentBalance currentBalance){
+        this.currentBalance = currentBalance;
+    }
+    public CurrentBalance getCurrentBalance(){
+        return this.currentBalance;
+    }
+    public void setInterestRate(int interestRate){
+        this.interestRate = interestRate;
+    }
+    public int getInterestRate(){
+        return this.interestRate;
+    }
+    public void setDisplayedName(String displayedName){
+        this.displayedName = displayedName;
+    }
+    public String getDisplayedName(){
+        return this.displayedName;
+    }
+    public void setDataset(List<Dataset> dataset){
+        this.dataset = dataset;
+    }
+    public List<Dataset> getDataset(){
+        return this.dataset;
     }
 }

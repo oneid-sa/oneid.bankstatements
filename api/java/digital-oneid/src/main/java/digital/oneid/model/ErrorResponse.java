@@ -13,9 +13,9 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class ErrorResponse {
 
-    String errorCode = "";
-    String errorMessage = "";
-    String referenceCode = "";
+    private String errorCode;
+    private String errorMessage;
+    private String referenceCode;
 
     public String getErroCode() {
         return errorCode;
