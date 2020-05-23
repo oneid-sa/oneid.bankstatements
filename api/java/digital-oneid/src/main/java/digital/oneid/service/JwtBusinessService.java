@@ -87,6 +87,12 @@ public class JwtBusinessService extends Constants implements UserDetailsService 
         return df.format(dateobj);
     }
 
+    public static boolean isNullOrEmpty(String str) {
+        if (str != null && !str.isEmpty())
+            return true;
+        return false;
+    }
+
     /**
      *
      * @param authorization_username
@@ -310,6 +316,29 @@ public class JwtBusinessService extends Constants implements UserDetailsService 
             return false;
     }
 
+    public int companyNameExistId(String companyName, int compId) {
+        TableCompanyInfo table = companyInfoRepository.findByCompanyName(companyName);
+        if(table != null) {
+            if(compId == table.getId())
+                return 1;
+            else
+                return 0;
+        }
+        else
+            return 1;
+    }
+
+    public int emailExistId(String email, int compId) {
+        TableCompanyInfo table = companyInfoRepository.findByEmail(email);
+        if(table != null) {
+            if(compId == table.getId())
+                return 1;
+            else
+                return 0;
+        }
+        else
+            return 1;
+    }
     /**
      * @param email
      * @return
@@ -395,18 +424,62 @@ public class JwtBusinessService extends Constants implements UserDetailsService 
 
     /**
      * @param companyId
-     * @param userRegisterRequest
+     * @param userRegisterResponse
      */
-    public void registerUserInDB(int companyId, long createdYodleeId, UserRegisterRequest userRegisterRequest) {
+    public void registerUserInDB(int companyId, long createdYodleeId, UserRegisterResponse userRegisterResponse) {
         TableUserRegistration userRegistration = new TableUserRegistration();
         userRegistration.setCompanyId(companyId);
-        userRegistration.setLoginName(userRegisterRequest.getUser().getLoginName());
-        userRegistration.setPassword(userRegisterRequest.getUser().getPassword());
-        userRegistration.setEmail(userRegisterRequest.getUser().getEmail());
+        userRegistration.setLoginName(userRegisterResponse.getUser().getLoginName());
+        userRegistration.setPassword(userRegisterResponse.getUser().getPassword());
+        userRegistration.setEmail(userRegisterResponse.getUser().getEmail());
+        userRegistration.setAddress(userRegisterResponse.getUser().getAddress().getAddress1());
+        userRegistration.setZip(userRegisterResponse.getUser().getAddress().getZip());
+        userRegistration.setCountry(userRegisterResponse.getUser().getAddress().getCountry());
+        userRegistration.setState(userRegisterResponse.getUser().getAddress().getState());
+        userRegistration.setFname(userRegisterResponse.getUser().getName().getFirst());
+        userRegistration.setLname(userRegisterResponse.getUser().getName().getLast());
+        userRegistration.setCurrency(userRegisterResponse.getUser().getPreferences().getCurrency());
+        userRegistration.setLocale(userRegisterResponse.getUser().getPreferences().getLocale());
         userRegistration.setCreatedAt(currentDateTime());
         userRegistration.setUpdatedAt(currentDateTime());
         userRegistration.setCreatedYodleeId(createdYodleeId);
         userDao.save(userRegistration);
+    }
+
+    public void updateUserInDB(UserEditRequest userEditRequest) {
+        TableUserRegistration tableUser = userDao.getOne(userEditRequest.getUserId());
+        if(isNullOrEmpty(userEditRequest.getUser().getEmail()))
+            tableUser.setEmail(userEditRequest.getUser().getEmail());
+        if(userEditRequest.getUser().getName() != null) {
+            if(isNullOrEmpty(userEditRequest.getUser().getName().getLast()))
+                tableUser.setLname(userEditRequest.getUser().getName().getLast());
+            if(isNullOrEmpty(userEditRequest.getUser().getName().getFirst()))
+                tableUser.setFname(userEditRequest.getUser().getName().getFirst());
+        }
+        if(userEditRequest.getUser().getAddress() != null) {
+            if(isNullOrEmpty(userEditRequest.getUser().getAddress().getAddress1()))
+                tableUser.setAddress(userEditRequest.getUser().getAddress().getAddress1());
+            if(isNullOrEmpty(userEditRequest.getUser().getAddress().getCity()))
+                tableUser.setCity(userEditRequest.getUser().getAddress().getCity());
+            if(isNullOrEmpty(userEditRequest.getUser().getAddress().getCountry()))
+                tableUser.setCountry(userEditRequest.getUser().getAddress().getCountry());
+            if(isNullOrEmpty(userEditRequest.getUser().getAddress().getState()))
+                tableUser.setState(userEditRequest.getUser().getAddress().getState());
+            if(isNullOrEmpty(userEditRequest.getUser().getAddress().getZip()))
+                tableUser.setZip(userEditRequest.getUser().getAddress().getZip());
+        }
+
+        if(userEditRequest.getUser().getPreferences() != null) {
+            if(isNullOrEmpty(userEditRequest.getUser().getPreferences().getCurrency()))
+                tableUser.setCurrency(userEditRequest.getUser().getPreferences().getCurrency());
+            if(isNullOrEmpty(userEditRequest.getUser().getPreferences().getDateFormat()))
+                tableUser.setDateFormat(userEditRequest.getUser().getPreferences().getDateFormat());
+            if(isNullOrEmpty(userEditRequest.getUser().getPreferences().getLocale()))
+                tableUser.setLocale(userEditRequest.getUser().getPreferences().getLocale());
+            if(isNullOrEmpty(userEditRequest.getUser().getPreferences().getTimeZone()))
+                tableUser.setTimeZone(userEditRequest.getUser().getPreferences().getTimeZone());
+        }
+        userDao.save(tableUser);
     }
 
     /**
@@ -467,5 +540,52 @@ public class JwtBusinessService extends Constants implements UserDetailsService 
         auditLogSearchResponse.setMessage("Success");
         auditLogSearchResponse.setCode(200);
         return auditLogSearchResponse;
+    }
+
+
+    public void updateCompanyInfo(EditCompanyRequest editCompanyRequest) {
+        TableCompanyInfo companyInfo = companyInfoRepository.getOne(editCompanyRequest.getId());
+        companyInfo.setPassword(editCompanyRequest.getPassword());
+        companyInfo.setCompanyName(editCompanyRequest.getCompanyName());
+        companyInfo.setAddress(editCompanyRequest.getAddress());
+        companyInfo.setEmail(editCompanyRequest.getEmail());
+        companyInfo.setUpdatedAt(currentDateTime());
+        companyInfoRepository.save(companyInfo);
+    }
+
+    public boolean companyIdExist(String companyID) {
+        return companyInfoRepository.existsById(Integer.parseInt(companyID));
+    }
+
+    public void changeCompanyStatus(int companyID, String action) {
+        TableCompanyInfo tableCompInfo = companyInfoRepository.getOne(companyID);
+        tableCompInfo.setStatus(action);
+        tableCompInfo.setUpdatedAt(currentDateTime());
+        companyInfoRepository.save(tableCompInfo);
+    }
+
+
+    public boolean userIdExist(int userId) {
+        return userDao.existsById(userId);
+    }
+
+    public void changeUserStatus(int id, String action) {
+        TableUserRegistration tableUser = userDao.getOne(id);
+        tableUser.setStatus(action);
+        tableUser.setUpdatedAt(currentDateTime());
+        userDao.save(tableUser);
+    }
+
+    public boolean userIsActive(String loginName) {
+        TableUserRegistration tabel = userDao.findByLoginNameAndStatus(loginName,"Y");
+        if(tabel != null)
+            return true;
+        else
+            return false;
+    }
+
+    public String getUsername(int userId) {
+        TableUserRegistration reg = userDao.getOne(userId);
+        return reg.getLoginName();
     }
 }

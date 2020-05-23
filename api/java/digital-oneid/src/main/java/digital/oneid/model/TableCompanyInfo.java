@@ -24,6 +24,8 @@ public class TableCompanyInfo {
     @Column
     private String address;
     @Column
+    private String status;
+    @Column
     private String createdAt;
     @Column
     private String updatedAt;
@@ -76,6 +78,13 @@ public class TableCompanyInfo {
     }
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public String getCreatedAt() {

@@ -16,4 +16,6 @@ public interface CompanyInfoRepository extends JpaRepository<TableCompanyInfo, I
     TableCompanyInfo findByCompanyName(String companyName);
 
     List<TableCompanyInfo> findByRoleIdGreaterThan(int i);
+
+
 }

@@ -71,21 +71,26 @@ public class JwtAuthenticationController extends Constants {
         if (isNullOrEmpty(authenticationRequest.getUsername()) && isNullOrEmpty(authenticationRequest.getPassword())) {
             TableCompanyInfo companyInfo = jwtBusinessService.getCompanyInfo(authenticationRequest.getUsername());
             if (companyInfo != null) {
-                if (companyInfo.getUsername().equalsIgnoreCase(authenticationRequest.getUsername())) {
-                    if (companyInfo.getPassword().equalsIgnoreCase(authenticationRequest.getPassword())) {
-                        String jwtToken = jwtTokenUtil.generateToken(jwtBusinessService.getUserDetails(authenticationRequest.getUsername(), authenticationRequest.getPassword()));
-                        jwtBusinessService.AuditLogging(companyInfo.getId(), companyInfo.getRoleId(), request.getRemoteAddr(), AUDIT_AUTH + "/" + SUCCESS);
-                        return ResponseEntity.ok(new JwtResponse(jwtToken, ERROR_CODE_200, SUCCESS));
+                if(companyInfo.getStatus().equalsIgnoreCase("Y")) {
+                    if (companyInfo.getUsername().equalsIgnoreCase(authenticationRequest.getUsername())) {
+                        if (companyInfo.getPassword().equalsIgnoreCase(authenticationRequest.getPassword())) {
+                            String jwtToken = jwtTokenUtil.generateToken(jwtBusinessService.getUserDetails(authenticationRequest.getUsername(), authenticationRequest.getPassword()));
+                            jwtBusinessService.AuditLogging(companyInfo.getId(), companyInfo.getRoleId(), request.getRemoteAddr(), AUDIT_AUTH + "/" +authenticationRequest.getUsername()+"/" + SUCCESS);
+                            return ResponseEntity.ok(new JwtResponse(jwtToken, ERROR_CODE_200, SUCCESS));
+                        } else {
+                            jwtBusinessService.AuditLogging(companyInfo.getId(), companyInfo.getRoleId(), request.getRemoteAddr(), AUDIT_AUTH + "/" +authenticationRequest.getUsername()+"/" + INVALID_LOGINPASSWORD);
+                            return getErrorResponseEntity(INVALID_LOGINPASSWORD, ERROR_CODE_400, HttpStatus.BAD_REQUEST);
+                        }
                     } else {
-                        jwtBusinessService.AuditLogging(companyInfo.getId(), companyInfo.getRoleId(), request.getRemoteAddr(), AUDIT_AUTH + "/" + INVALID_LOGINPASSWORD);
-                        return getErrorResponseEntity(INVALID_LOGINPASSWORD, ERROR_CODE_400, HttpStatus.BAD_REQUEST);
+                        jwtBusinessService.AuditLogging(companyInfo.getId(), companyInfo.getRoleId(), request.getRemoteAddr(), AUDIT_AUTH + "/" +authenticationRequest.getUsername()+"/" + USER_NAME_INVALID);
+                        return getErrorResponseEntity(USER_NAME_INVALID, ERROR_CODE_400, HttpStatus.BAD_REQUEST);
                     }
                 } else {
-                    jwtBusinessService.AuditLogging(companyInfo.getId(), companyInfo.getRoleId(), request.getRemoteAddr(), AUDIT_AUTH + "/" + USER_NAME_INVALID);
-                    return getErrorResponseEntity(USER_NAME_INVALID, ERROR_CODE_400, HttpStatus.BAD_REQUEST);
+                    jwtBusinessService.AuditLogging(companyInfo.getId(), companyInfo.getRoleId(), request.getRemoteAddr(), AUDIT_AUTH + "/"+authenticationRequest.getUsername()+ "/" + COMPANY_INACTIVE_STATE);
+                    return getErrorResponseEntity(COMPANY_INACTIVE_STATE, ERROR_CODE_400, HttpStatus.BAD_REQUEST);
                 }
             } else {
-                jwtBusinessService.AuditLogging(companyInfo.getId(), companyInfo.getRoleId(), request.getRemoteAddr(), AUDIT_AUTH + "/" + USER_NAME_INVALID);
+                jwtBusinessService.AuditLogging(companyInfo.getId(), companyInfo.getRoleId(), request.getRemoteAddr(), AUDIT_AUTH + "/" +authenticationRequest.getUsername()+"/" + USER_NAME_INVALID);
                 return getErrorResponseEntity(USER_NAME_INVALID, ERROR_CODE_400, HttpStatus.BAD_REQUEST);
             }
         } else {
@@ -144,6 +149,64 @@ public class JwtAuthenticationController extends Constants {
         }
     }
 
+    /**
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/api/auth/company/edit", method = RequestMethod.POST)
+    public ResponseEntity<?> companyEdit(@RequestBody EditCompanyRequest editCompanyRequest,HttpServletRequest request) throws Exception {
+        if (jwtBusinessService.getRoleAccess() == ROLE_CLIENT) {
+            if(editCompanyRequest.getId() != 0 && isNullOrEmpty(editCompanyRequest.getCompanyName()) && isNullOrEmpty(editCompanyRequest.getEmail()) && isNullOrEmpty(editCompanyRequest.getPassword()) && isNullOrEmpty(editCompanyRequest.getAddress())) {
+                if(jwtBusinessService.companyNameExistId(editCompanyRequest.getCompanyName(),editCompanyRequest.getId()) != 0) {
+                    if(jwtBusinessService.emailExistId(editCompanyRequest.getEmail(),editCompanyRequest.getId()) != 0) {
+                        jwtBusinessService.updateCompanyInfo(editCompanyRequest);
+                        jwtBusinessService.AuditLogging(editCompanyRequest.getId(), ROLE_CLIENT, request.getRemoteAddr(), AUDIT_COMPANY_EDIT + "/"+editCompanyRequest.getCompanyName() + "/" + SUCCESS);
+                        return getSuccessResponseEntity(COMPANY_EDIT_SUCCCESS);
+                    } else {
+                        return getErrorResponseEntity(EMAIL_EXIST, ERROR_CODE_400, HttpStatus.BAD_REQUEST);
+                    }
+                } else {
+                    return getErrorResponseEntity(COMPANY_NAME_EXIST, ERROR_CODE_400, HttpStatus.BAD_REQUEST);
+                }
+            } else {
+                return getErrorResponseEntity(PARAM_INVALID, ERROR_CODE_400, HttpStatus.BAD_REQUEST);
+            }
+        } else {
+            return getErrorResponseEntity(ROLE_ACCESS_FAILED, ERROR_CODE_400, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @RequestMapping(value = "/api/auth/company/change/status", method = RequestMethod.GET)
+    public ResponseEntity<?> companyDelete(@RequestParam (value = "id", defaultValue = "") String companyID,
+                                           @RequestParam (value = "action", defaultValue = "") String action,
+                                           HttpServletRequest request) throws Exception {
+        if (jwtBusinessService.getRoleAccess() == ROLE_CLIENT) {
+            if(isNullOrEmpty(companyID)) {
+                if(jwtBusinessService.companyIdExist(companyID)) {
+                    if(action.equalsIgnoreCase("Y") || action.equalsIgnoreCase("N")) {
+                        jwtBusinessService.changeCompanyStatus(Integer.parseInt(companyID), action);
+                        if(action.equalsIgnoreCase("Y")) {
+                            jwtBusinessService.AuditLogging(Integer.parseInt(companyID), ROLE_CLIENT, request.getRemoteAddr(), AUDIT_COMPANY_STATUS + "/"+companyID+ "/" + COMPANY_ACTIVATED);
+                            return getSuccessResponseEntity(COMPANY_ACTIVATED);
+                        }
+                        else {
+                            jwtBusinessService.AuditLogging(Integer.parseInt(companyID), ROLE_CLIENT, request.getRemoteAddr(), AUDIT_COMPANY_STATUS + "/"+companyID+ "/" + COMPANY_INACTIVATED);
+                            return getSuccessResponseEntity(COMPANY_INACTIVATED);
+                        }
+                    } else {
+                        return getErrorResponseEntity(INVALID_ACTION_STATUS, ERROR_CODE_400, HttpStatus.BAD_REQUEST);
+                    }
+                } else {
+                    return getErrorResponseEntity(COMPANY_ID_INVALID, ERROR_CODE_400, HttpStatus.BAD_REQUEST);
+                }
+            } else {
+                return getErrorResponseEntity(PARAM_INVALID, ERROR_CODE_400, HttpStatus.BAD_REQUEST);
+            }
+        } else {
+            return getErrorResponseEntity(ROLE_ACCESS_FAILED, ERROR_CODE_400, HttpStatus.BAD_REQUEST);
+        }
+    }
+
 
     /**
      * RequestMapping annotation maps HTTP requests to handler methods of REST controllers.
@@ -175,7 +238,7 @@ public class JwtAuthenticationController extends Constants {
                         }
                     } else {
                         long createdIdInYodlee = userRegisterResp.getUser().getId();
-                        jwtBusinessService.registerUserInDB(companyId, createdIdInYodlee, userRegisterRequest);
+                        jwtBusinessService.registerUserInDB(companyId, createdIdInYodlee, userRegisterResp);
                         jwtBusinessService.AuditLogging(companyId, ROLE_COMPANY, request.getRemoteAddr(), AUDIT_USER_CREATE + "/" + SUCCESS);
                         return ResponseEntity.ok(userRegisterResp);
                     }
@@ -193,6 +256,86 @@ public class JwtAuthenticationController extends Constants {
         }
     }
 
+    @RequestMapping(value = "/api/company/user/edit", method = RequestMethod.POST)
+    public ResponseEntity<?> userEdit(@RequestBody UserEditRequest userEditRequest, HttpServletRequest request) throws Exception {
+        if (isNullOrEmpty(String.valueOf(userEditRequest.getUserId()))) {
+            if (jwtBusinessService.getRoleAccess() == ROLE_COMPANY) {
+                if(jwtBusinessService.userIdExist(userEditRequest.getUserId())) {
+                    String apiVersion = env.getProperty(APP_VERSION);
+                    String baseUrl = env.getProperty(BASE_URL);
+                    String cobrandName = jwtBusinessService.getCobrandName();
+                    CobrandLoginResponse cobrandSessionTokenInfo = getCobrandSessionToken();
+                    if (cobrandSessionTokenInfo.getErrorResponse().getErroCode().equalsIgnoreCase(ERROR_CODE_200)) {
+                        String loginName = jwtBusinessService.getUsername(userEditRequest.getUserId());
+                        String args[] = getArgs("");
+                        YodleeJwtTokenGenerate tokenYodleeGenerator = new YodleeJwtTokenGenerate(args);
+                        String yodleeUserToken = tokenYodleeGenerator.generateJwtYodlee(false, loginName);
+                        net.minidev.json.JSONObject obj = yodleeServiceConsumer.userEdit(baseUrl, apiVersion, cobrandName, yodleeUserToken, userEditRequest);
+                        int companyId = jwtBusinessService.getCompanyId();
+                        if (obj != null && (obj.getAsString("status_code") == ERROR_CODE_400 || obj.getAsString("status_code") == ERROR_CODE_401)) {
+                            if (obj.getAsString("status_code") == ERROR_CODE_400) {
+                                jwtBusinessService.AuditLogging(companyId, ROLE_COMPANY, request.getRemoteAddr(), AUDIT_USER_EDIT + "/" +userEditRequest.getUserId()+ "/" + obj.getAsString("message"));
+                                return new ResponseEntity<Object>(
+                                        obj, new HttpHeaders(), HttpStatus.BAD_REQUEST);
+                            } else {
+                                jwtBusinessService.AuditLogging(companyId, ROLE_COMPANY, request.getRemoteAddr(), AUDIT_USER_EDIT + "/" +userEditRequest.getUserId()+ "/" + obj.getAsString("message"));
+                                return new ResponseEntity<Object>(
+                                        obj, new HttpHeaders(), HttpStatus.UNAUTHORIZED);
+                            }
+                        } else {
+                            jwtBusinessService.updateUserInDB(userEditRequest);
+                            jwtBusinessService.AuditLogging(companyId, ROLE_COMPANY, request.getRemoteAddr(), AUDIT_USER_EDIT + "/" +userEditRequest.getUserId()+ "/" + SUCCESS);
+                            return getSuccessResponseEntity(USER_UPDATED_SUCCESS);
+                        }
+                    } else {
+                        int companyId = jwtBusinessService.getCompanyId();
+                        jwtBusinessService.AuditLogging(companyId, ROLE_COMPANY, request.getRemoteAddr(), AUDIT_USER_CREATE + "/" + cobrandSessionTokenInfo.getErrorResponse().getErroMessage());
+                        return new ResponseEntity<Object>(
+                                cobrandSessionTokenInfo.getErrorResponse(), new HttpHeaders(), HttpStatus.BAD_REQUEST);
+                    }
+                } else {
+                    return getErrorResponseEntity(INVALID_USER_ID, ERROR_CODE_400, HttpStatus.BAD_REQUEST);
+                }
+            } else {
+                return getErrorResponseEntity(COMPANY_ACCESS, ERROR_CODE_400, HttpStatus.BAD_REQUEST);
+            }
+        } else {
+            return getErrorResponseEntity(PARAM_INVALID, ERROR_CODE_400, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @RequestMapping(value = "/api/auth/company/user/change/status", method = RequestMethod.GET)
+    public ResponseEntity<?> userDelete(@RequestParam (value = "id", defaultValue = "") String userId,
+                                           @RequestParam (value = "action", defaultValue = "") String action,
+                                           HttpServletRequest request) throws Exception {
+        if (jwtBusinessService.getRoleAccess() == ROLE_COMPANY) {
+            if(isNullOrEmpty(userId)) {
+                if(jwtBusinessService.userIdExist(Integer.parseInt(userId))) {
+                    if(action.equalsIgnoreCase("Y") || action.equalsIgnoreCase("N")) {
+                        int companyId = jwtBusinessService.getCompanyId();
+                        jwtBusinessService.changeUserStatus(Integer.parseInt(userId), action);
+                        if(action.equalsIgnoreCase("Y")) {
+                            jwtBusinessService.AuditLogging(companyId, ROLE_CLIENT, request.getRemoteAddr(), AUDIT_USER_STATUS + "/"+userId+ "/" + COMPANY_ACTIVATED);
+                            return getSuccessResponseEntity(USER_ACTIVATED);
+                        }
+                        else {
+                            jwtBusinessService.AuditLogging(companyId, ROLE_CLIENT, request.getRemoteAddr(), AUDIT_USER_STATUS + "/"+userId+ "/" + COMPANY_INACTIVATED);
+                            return getSuccessResponseEntity(USER_INACTIVATED);
+                        }
+                    } else {
+                        return getErrorResponseEntity(INVALID_ACTION_STATUS, ERROR_CODE_400, HttpStatus.BAD_REQUEST);
+                    }
+                } else {
+                    return getErrorResponseEntity(INVALID_USER_ID, ERROR_CODE_400, HttpStatus.BAD_REQUEST);
+                }
+            } else {
+                return getErrorResponseEntity(PARAM_INVALID, ERROR_CODE_400, HttpStatus.BAD_REQUEST);
+            }
+        } else {
+            return getErrorResponseEntity(COMPANY_ACCESS, ERROR_CODE_400, HttpStatus.BAD_REQUEST);
+        }
+    }
+
 
     /**
      * RequestMapping annotation maps HTTP requests to handler methods of REST controllers.
@@ -202,7 +345,7 @@ public class JwtAuthenticationController extends Constants {
      * @throws Exception
      */
     @RequestMapping(value = "/api/company/user/list", method = RequestMethod.GET)
-    public ResponseEntity<?> userRegisterList(HttpServletRequest request) throws Exception {
+    public ResponseEntity<?> userRegisterList( HttpServletRequest request) throws Exception {
         if (jwtBusinessService.getRoleAccess() == ROLE_COMPANY) {
             int companyId = jwtBusinessService.getCompanyId();
             JSONObject jsonObject = jwtBusinessService.getCompanyUserList(companyId);
@@ -224,19 +367,23 @@ public class JwtAuthenticationController extends Constants {
     public ResponseEntity<?> userAccount(@RequestParam(value = "username", defaultValue = "") String loginName, HttpServletRequest request) throws Exception {
         if (isNullOrEmpty(loginName) && jwtBusinessService.UsernameExist(loginName)) {
             if (jwtBusinessService.getRoleAccess() == ROLE_COMPANY) {
-                int companyId = jwtBusinessService.getCompanyId();
-                if (jwtBusinessService.checkCompanyIdAndLoginNameIsValid(companyId, loginName) != 0) {
-                    String apiVersion = env.getProperty(APP_VERSION);
-                    String baseUrl = env.getProperty(BASE_URL);
-                    String cobrandName = jwtBusinessService.getCobrandName();
-                    String args[] = getArgs("");
-                    YodleeJwtTokenGenerate tokenYodleeGenerator = new YodleeJwtTokenGenerate(args);
-                    String yodleeUserJwtToken = tokenYodleeGenerator.generateJwtYodlee(false, loginName);
-                    jwtBusinessService.AuditLogging(companyId, ROLE_COMPANY, request.getRemoteAddr(), AUDIT_USER_ACCOUNT_GET + "/" + loginName + "/" + SUCCESS);
-                    return ResponseEntity.ok(yodleeServiceConsumer.getAccountInformation(baseUrl, apiVersion, cobrandName, yodleeUserJwtToken));
+                if(jwtBusinessService.userIsActive(loginName)) {
+                    int companyId = jwtBusinessService.getCompanyId();
+                    if (jwtBusinessService.checkCompanyIdAndLoginNameIsValid(companyId, loginName) != 0) {
+                        String apiVersion = env.getProperty(APP_VERSION);
+                        String baseUrl = env.getProperty(BASE_URL);
+                        String cobrandName = jwtBusinessService.getCobrandName();
+                        String args[] = getArgs("");
+                        YodleeJwtTokenGenerate tokenYodleeGenerator = new YodleeJwtTokenGenerate(args);
+                        String yodleeUserJwtToken = tokenYodleeGenerator.generateJwtYodlee(false, loginName);
+                        jwtBusinessService.AuditLogging(companyId, ROLE_COMPANY, request.getRemoteAddr(), AUDIT_USER_ACCOUNT_GET + "/" + loginName + "/" + SUCCESS);
+                        return ResponseEntity.ok(yodleeServiceConsumer.getAccountInformation(baseUrl, apiVersion, cobrandName, yodleeUserJwtToken));
+                    } else {
+                        jwtBusinessService.AuditLogging(companyId, ROLE_COMPANY, request.getRemoteAddr(), AUDIT_USER_ACCOUNT_GET + "/" + loginName + "/" + INVALID_NAME_COMPANY);
+                        return getErrorResponseEntity(INVALID_NAME_COMPANY, ERROR_CODE_400, HttpStatus.BAD_REQUEST);
+                    }
                 } else {
-                    jwtBusinessService.AuditLogging(companyId, ROLE_COMPANY, request.getRemoteAddr(), AUDIT_USER_ACCOUNT_GET + "/" + loginName + "/" + INVALID_NAME_COMPANY);
-                    return getErrorResponseEntity(INVALID_NAME_COMPANY, ERROR_CODE_400, HttpStatus.BAD_REQUEST);
+                    return getErrorResponseEntity(USER_INACTIVE_STATE, ERROR_CODE_401, HttpStatus.UNAUTHORIZED);
                 }
             } else {
                 return getErrorResponseEntity(COMPANY_ACCESS, ERROR_CODE_401, HttpStatus.UNAUTHORIZED);
@@ -261,27 +408,31 @@ public class JwtAuthenticationController extends Constants {
                                            @RequestParam(value = "container", defaultValue = "") String container, HttpServletRequest request) throws Exception {
         if (jwtBusinessService.getRoleAccess() == ROLE_COMPANY) {
             if (isNullOrEmpty(loginName) && accountID != 0 && isNullOrEmpty(container)) {
-                if (container.equalsIgnoreCase(CONTAINER_ARR[0]) || container.equalsIgnoreCase(CONTAINER_ARR[2]) || container.equalsIgnoreCase(CONTAINER_ARR[3]) || container.equalsIgnoreCase(CONTAINER_ARR[4])) {
-                    if (jwtBusinessService.UsernameExist(loginName)) {
-                        int companyId = jwtBusinessService.getCompanyId();
-                        if (jwtBusinessService.checkCompanyIdAndLoginNameIsValid(companyId, loginName) != 0) {
-                            String args[] = getArgs("");
-                            String apiVersion = env.getProperty(APP_VERSION);
-                            String baseUrl = env.getProperty(BASE_URL);
-                            String cobrandName = jwtBusinessService.getCobrandName();
-                            YodleeJwtTokenGenerate tokenYodleeGenerator = new YodleeJwtTokenGenerate(args);
-                            String yodleeUserToken = tokenYodleeGenerator.generateJwtYodlee(false, loginName);
-                            jwtBusinessService.AuditLogging(companyId, ROLE_COMPANY, request.getRemoteAddr(), AUDIT_USER_STATEMENT + "/" + loginName + "/" + SUCCESS);
-                            return ResponseEntity.ok(yodleeServiceConsumer.getStatements(baseUrl, apiVersion, cobrandName, yodleeUserToken, accountID, container, isLatest, status));
+                if(jwtBusinessService.userIsActive(loginName)) {
+                    if (container.equalsIgnoreCase(CONTAINER_ARR[0]) || container.equalsIgnoreCase(CONTAINER_ARR[2]) || container.equalsIgnoreCase(CONTAINER_ARR[3]) || container.equalsIgnoreCase(CONTAINER_ARR[4])) {
+                        if (jwtBusinessService.UsernameExist(loginName)) {
+                            int companyId = jwtBusinessService.getCompanyId();
+                            if (jwtBusinessService.checkCompanyIdAndLoginNameIsValid(companyId, loginName) != 0) {
+                                String args[] = getArgs("");
+                                String apiVersion = env.getProperty(APP_VERSION);
+                                String baseUrl = env.getProperty(BASE_URL);
+                                String cobrandName = jwtBusinessService.getCobrandName();
+                                YodleeJwtTokenGenerate tokenYodleeGenerator = new YodleeJwtTokenGenerate(args);
+                                String yodleeUserToken = tokenYodleeGenerator.generateJwtYodlee(false, loginName);
+                                jwtBusinessService.AuditLogging(companyId, ROLE_COMPANY, request.getRemoteAddr(), AUDIT_USER_STATEMENT + "/" + loginName + "/" + SUCCESS);
+                                return ResponseEntity.ok(yodleeServiceConsumer.getStatements(baseUrl, apiVersion, cobrandName, yodleeUserToken, accountID, container, isLatest, status));
+                            } else {
+                                jwtBusinessService.AuditLogging(companyId, ROLE_COMPANY, request.getRemoteAddr(), AUDIT_USER_STATEMENT + "/" + loginName + "/" + INVALID_NAME_COMPANY);
+                                return getErrorResponseEntity(INVALID_NAME_COMPANY, ERROR_CODE_400, HttpStatus.BAD_REQUEST);
+                            }
                         } else {
-                            jwtBusinessService.AuditLogging(companyId, ROLE_COMPANY, request.getRemoteAddr(), AUDIT_USER_STATEMENT + "/" + loginName + "/" + INVALID_NAME_COMPANY);
-                            return getErrorResponseEntity(INVALID_NAME_COMPANY, ERROR_CODE_400, HttpStatus.BAD_REQUEST);
+                            return getErrorResponseEntity(INVALID_USERNAME + loginName, ERROR_CODE_400, HttpStatus.BAD_REQUEST);
                         }
                     } else {
-                        return getErrorResponseEntity(INVALID_USERNAME + loginName, ERROR_CODE_400, HttpStatus.BAD_REQUEST);
+                        return getErrorResponseEntity(INVALID_CONTAINER_FOUND_STATEMENT, ERROR_CODE_400, HttpStatus.BAD_REQUEST);
                     }
                 } else {
-                    return getErrorResponseEntity(INVALID_CONTAINER_FOUND_STATEMENT, ERROR_CODE_400, HttpStatus.BAD_REQUEST);
+                    return getErrorResponseEntity(USER_INACTIVE_STATE, ERROR_CODE_401, HttpStatus.UNAUTHORIZED);
                 }
             } else {
                 return getErrorResponseEntity( PARAM_INVALID , ERROR_CODE_400, HttpStatus.BAD_REQUEST);
@@ -303,26 +454,30 @@ public class JwtAuthenticationController extends Constants {
     public ResponseEntity<?> generateApplicationTokenYodlee(@RequestParam(value = "username", defaultValue = "") String loginName, HttpServletRequest request) throws Exception {
         if (jwtBusinessService.getRoleAccess() == ROLE_COMPANY) {
             if (isNullOrEmpty(loginName)) {
-                if (jwtBusinessService.UsernameExist(loginName)) {
-                    int companyId = jwtBusinessService.getCompanyId();
-                    if (jwtBusinessService.checkCompanyIdAndLoginNameIsValid(companyId, loginName) != 0) {
-                        String args[] = getArgs("");
-                        YodleeJwtTokenGenerate tokenYodleeGenerator = new YodleeJwtTokenGenerate(args);
-                        String yodleeToken = tokenYodleeGenerator.generateJwtYodlee(false, loginName);
-                        FastlinkResponse fastlinkResponse = new FastlinkResponse();
-                        fastlinkResponse.setFastLink(env.getProperty(FASTLINK));
-                        fastlinkResponse.setFinAppid(Long.parseLong(env.getProperty(FINAPPID)));
-                        fastlinkResponse.setFastLinkJwtToken(yodleeToken);
-                        fastlinkResponse.setRedirectReq(Boolean.parseBoolean(env.getProperty(REDIRECTREQ)));
-                        fastlinkResponse.setCallbackUrl(env.getProperty(CALBACKURL));
-                        jwtBusinessService.AuditLogging(companyId, ROLE_COMPANY, request.getRemoteAddr(), AUDIT_USER_FASTLINK + "/" + loginName + "/" + SUCCESS);
-                        return ResponseEntity.ok(fastlinkResponse);
+                if(jwtBusinessService.userIsActive(loginName)) {
+                    if (jwtBusinessService.UsernameExist(loginName)) {
+                        int companyId = jwtBusinessService.getCompanyId();
+                        if (jwtBusinessService.checkCompanyIdAndLoginNameIsValid(companyId, loginName) != 0) {
+                            String args[] = getArgs("");
+                            YodleeJwtTokenGenerate tokenYodleeGenerator = new YodleeJwtTokenGenerate(args);
+                            String yodleeToken = tokenYodleeGenerator.generateJwtYodlee(false, loginName);
+                            FastlinkResponse fastlinkResponse = new FastlinkResponse();
+                            fastlinkResponse.setFastLink(env.getProperty(FASTLINK));
+                            fastlinkResponse.setFinAppid(Long.parseLong(env.getProperty(FINAPPID)));
+                            fastlinkResponse.setFastLinkJwtToken(yodleeToken);
+                            fastlinkResponse.setRedirectReq(Boolean.parseBoolean(env.getProperty(REDIRECTREQ)));
+                            fastlinkResponse.setCallbackUrl(env.getProperty(CALBACKURL));
+                            jwtBusinessService.AuditLogging(companyId, ROLE_COMPANY, request.getRemoteAddr(), AUDIT_USER_FASTLINK + "/" + loginName + "/" + SUCCESS);
+                            return ResponseEntity.ok(fastlinkResponse);
+                        } else {
+                            jwtBusinessService.AuditLogging(companyId, ROLE_COMPANY, request.getRemoteAddr(), AUDIT_USER_FASTLINK + "/" + loginName + "/" + INVALID_NAME_COMPANY);
+                            return getErrorResponseEntity(INVALID_NAME_COMPANY, ERROR_CODE_400, HttpStatus.BAD_REQUEST);
+                        }
                     } else {
-                        jwtBusinessService.AuditLogging(companyId, ROLE_COMPANY, request.getRemoteAddr(), AUDIT_USER_FASTLINK + "/" + loginName + "/" + INVALID_NAME_COMPANY);
-                        return getErrorResponseEntity(INVALID_NAME_COMPANY, ERROR_CODE_400, HttpStatus.BAD_REQUEST);
+                        return getErrorResponseEntity(INVALID_USERNAME + loginName, ERROR_CODE_400, HttpStatus.BAD_REQUEST);
                     }
                 } else {
-                    return getErrorResponseEntity(INVALID_USERNAME + loginName, ERROR_CODE_400, HttpStatus.BAD_REQUEST);
+                    return getErrorResponseEntity(USER_INACTIVE_STATE, ERROR_CODE_401, HttpStatus.UNAUTHORIZED);
                 }
             } else {
                 return getErrorResponseEntity(PARAM_INVALID, ERROR_CODE_400, HttpStatus.BAD_REQUEST);
@@ -355,19 +510,23 @@ public class JwtAuthenticationController extends Constants {
         if (jwtBusinessService.getRoleAccess() == ROLE_COMPANY) {
             if (isNullOrEmpty(loginName) && isNullOrEmpty(container) && isNullOrEmpty(accountId)) {
                 if (jwtBusinessService.UsernameExist(loginName)) {
-                    int companyId = jwtBusinessService.getCompanyId();
-                    if (jwtBusinessService.checkCompanyIdAndLoginNameIsValid(companyId, loginName) != 0) {
-                        String args[] = getArgs("");
-                        String apiVersion = env.getProperty(APP_VERSION);
-                        String baseUrl = env.getProperty(BASE_URL);
-                        String cobrandName = jwtBusinessService.getCobrandName();
-                        YodleeJwtTokenGenerate tokenYodleeGenerator = new YodleeJwtTokenGenerate(args);
-                        String yodleeUserToken = tokenYodleeGenerator.generateJwtYodlee(false, loginName);
-                        jwtBusinessService.AuditLogging(companyId, ROLE_COMPANY, request.getRemoteAddr(), AUDIT_USER_TRANSACTION + "/" + loginName + "/" + SUCCESS);
-                        return ResponseEntity.ok(yodleeServiceConsumer.getTransactionInfo(baseUrl, apiVersion, cobrandName, yodleeUserToken, Long.parseLong(accountId), container, fromDate, toDate, categoryId,categoryType,highLevelCategoryId));
+                    if(jwtBusinessService.userIsActive(loginName)) {
+                        int companyId = jwtBusinessService.getCompanyId();
+                        if (jwtBusinessService.checkCompanyIdAndLoginNameIsValid(companyId, loginName) != 0) {
+                            String args[] = getArgs("");
+                            String apiVersion = env.getProperty(APP_VERSION);
+                            String baseUrl = env.getProperty(BASE_URL);
+                            String cobrandName = jwtBusinessService.getCobrandName();
+                            YodleeJwtTokenGenerate tokenYodleeGenerator = new YodleeJwtTokenGenerate(args);
+                            String yodleeUserToken = tokenYodleeGenerator.generateJwtYodlee(false, loginName);
+                            jwtBusinessService.AuditLogging(companyId, ROLE_COMPANY, request.getRemoteAddr(), AUDIT_USER_TRANSACTION + "/" + loginName + "/" + accountId + "/" + SUCCESS);
+                            return ResponseEntity.ok(yodleeServiceConsumer.getTransactionInfo(baseUrl, apiVersion, cobrandName, yodleeUserToken, Long.parseLong(accountId), container, fromDate, toDate, categoryId, categoryType, highLevelCategoryId));
+                        } else {
+                            jwtBusinessService.AuditLogging(companyId, ROLE_COMPANY, request.getRemoteAddr(), AUDIT_USER_TRANSACTION + "/" + loginName + "/" + accountId + "/" + INVALID_NAME_COMPANY);
+                            return getErrorResponseEntity(INVALID_NAME_COMPANY, ERROR_CODE_400, HttpStatus.BAD_REQUEST);
+                        }
                     } else {
-                        jwtBusinessService.AuditLogging(companyId, ROLE_COMPANY, request.getRemoteAddr(), AUDIT_USER_TRANSACTION + "/" + loginName + "/" + INVALID_NAME_COMPANY);
-                        return getErrorResponseEntity(INVALID_NAME_COMPANY, ERROR_CODE_400, HttpStatus.BAD_REQUEST);
+                        return getErrorResponseEntity(USER_INACTIVE_STATE, ERROR_CODE_401, HttpStatus.UNAUTHORIZED);
                     }
                 } else {
                     return getErrorResponseEntity(INVALID_USERNAME + loginName, ERROR_CODE_400, HttpStatus.BAD_REQUEST);
@@ -391,27 +550,31 @@ public class JwtAuthenticationController extends Constants {
             if (jwtBusinessService.getRoleAccess() == ROLE_COMPANY) {
                 int companyId = jwtBusinessService.getCompanyId();
                 if (jwtBusinessService.checkCompanyIdAndLoginNameIsValid(companyId, categoriesCreateRequest.getUsername()) != 0) {
-                    String args[] = getArgs("");
-                    String apiVersion = env.getProperty(APP_VERSION);
-                    String baseUrl = env.getProperty(BASE_URL);
-                    String cobrandName = jwtBusinessService.getCobrandName();
-                    YodleeJwtTokenGenerate tokenYodleeGenerator = new YodleeJwtTokenGenerate(args);
-                    String yodleeUserToken = tokenYodleeGenerator.generateJwtYodlee(false, categoriesCreateRequest.getUsername());
-                    ErrorResponse response = yodleeServiceConsumer.createCategoryForUser(apiVersion, baseUrl, cobrandName, yodleeUserToken, categoriesCreateRequest.getCategoryName(), categoriesCreateRequest.getParentCategoryId());
-                    if (response != null && response.getErroCode().equalsIgnoreCase(ERROR_CODE_200)) {
-                        jwtBusinessService.insertTransactionCategoryDB(companyId, categoriesCreateRequest.getUsername(), categoriesCreateRequest.getCategoryName(), categoriesCreateRequest.getParentCategoryId());
-                        jwtBusinessService.AuditLogging(companyId, ROLE_COMPANY, request.getRemoteAddr(), AUDIT_USER_CATEGORY_CREATE + "/" + categoriesCreateRequest.getUsername() + "/" + SUCCESS);
-                        return getSuccessResponseEntity(TRANSACTION_CATEGORY_CREATED);
-                    } else {
-                        if (response.getErroCode().equalsIgnoreCase(ERROR_CODE_400)) {
-                            jwtBusinessService.AuditLogging(companyId, ROLE_COMPANY, request.getRemoteAddr(), AUDIT_USER_CATEGORY_CREATE + "/" + categoriesCreateRequest.getUsername() + "/" + response.getErroMessage());
-                            return new ResponseEntity<Object>(
-                                    response, new HttpHeaders(), HttpStatus.BAD_REQUEST);
+                    if(jwtBusinessService.userIsActive(categoriesCreateRequest.getUsername())) {
+                        String args[] = getArgs("");
+                        String apiVersion = env.getProperty(APP_VERSION);
+                        String baseUrl = env.getProperty(BASE_URL);
+                        String cobrandName = jwtBusinessService.getCobrandName();
+                        YodleeJwtTokenGenerate tokenYodleeGenerator = new YodleeJwtTokenGenerate(args);
+                        String yodleeUserToken = tokenYodleeGenerator.generateJwtYodlee(false, categoriesCreateRequest.getUsername());
+                        ErrorResponse response = yodleeServiceConsumer.createCategoryForUser(apiVersion, baseUrl, cobrandName, yodleeUserToken, categoriesCreateRequest.getCategoryName(), categoriesCreateRequest.getParentCategoryId());
+                        if (response != null && response.getErroCode().equalsIgnoreCase(ERROR_CODE_200)) {
+                            jwtBusinessService.insertTransactionCategoryDB(companyId, categoriesCreateRequest.getUsername(), categoriesCreateRequest.getCategoryName(), categoriesCreateRequest.getParentCategoryId());
+                            jwtBusinessService.AuditLogging(companyId, ROLE_COMPANY, request.getRemoteAddr(), AUDIT_USER_CATEGORY_CREATE + "/" + categoriesCreateRequest.getUsername() + "/" + SUCCESS);
+                            return getSuccessResponseEntity(TRANSACTION_CATEGORY_CREATED);
                         } else {
-                            jwtBusinessService.AuditLogging(companyId, ROLE_COMPANY, request.getRemoteAddr(), AUDIT_USER_CATEGORY_CREATE + "/" + categoriesCreateRequest.getUsername() + "/" + response.getErroMessage());
-                            return new ResponseEntity<Object>(
-                                    response, new HttpHeaders(), HttpStatus.UNAUTHORIZED);
+                            if (response.getErroCode().equalsIgnoreCase(ERROR_CODE_400)) {
+                                jwtBusinessService.AuditLogging(companyId, ROLE_COMPANY, request.getRemoteAddr(), AUDIT_USER_CATEGORY_CREATE + "/" + categoriesCreateRequest.getUsername() + "/" + response.getErroMessage());
+                                return new ResponseEntity<Object>(
+                                        response, new HttpHeaders(), HttpStatus.BAD_REQUEST);
+                            } else {
+                                jwtBusinessService.AuditLogging(companyId, ROLE_COMPANY, request.getRemoteAddr(), AUDIT_USER_CATEGORY_CREATE + "/" + categoriesCreateRequest.getUsername() + "/" + response.getErroMessage());
+                                return new ResponseEntity<Object>(
+                                        response, new HttpHeaders(), HttpStatus.UNAUTHORIZED);
+                            }
                         }
+                    } else {
+                        return getErrorResponseEntity(USER_INACTIVE_STATE, ERROR_CODE_401, HttpStatus.UNAUTHORIZED);
                     }
                 } else {
                     jwtBusinessService.AuditLogging(companyId, ROLE_COMPANY, request.getRemoteAddr(), AUDIT_USER_CATEGORY_CREATE + "/" + categoriesCreateRequest.getUsername() + "/" + INVALID_NAME_COMPANY);
@@ -441,29 +604,34 @@ public class JwtAuthenticationController extends Constants {
             String baseUrl = env.getProperty(BASE_URL);
             String cobrandName = jwtBusinessService.getCobrandName();
             int companyId = jwtBusinessService.getCompanyId();
-            if (cobrandLevel) {
-                CobrandLoginResponse resp = getCobrandSessionToken();
-                jwtBusinessService.AuditLogging(companyId, ROLE_COMPANY, request.getRemoteAddr(), AUDIT_USER_CATEGORY_LIST + "/cobrandLevel" + "/" + username + "/" + SUCCESS);
-                Object obj = yodleeServiceConsumer.transactionCategoriesList(apiVersion, baseUrl, cobrandName, cobrandLevel, userLevel, resp.getSession().getCobSession());
-                return ResponseEntity.ok(obj);
-            } else if (userLevel) {
-                if (username != EMPTY && jwtBusinessService.checkCompanyIdAndLoginNameIsValid(companyId, username) != 0) {
-                    String args[] = getArgs("");
-                    YodleeJwtTokenGenerate tokenYodleeGenerator = new YodleeJwtTokenGenerate(args);
-                    String yodleeUserToken = tokenYodleeGenerator.generateJwtYodlee(false, username);
-                    jwtBusinessService.AuditLogging(companyId, ROLE_COMPANY, request.getRemoteAddr(), AUDIT_USER_CATEGORY_LIST + "/userLevel" + "/" + username + "/" + SUCCESS);
-                    Object obj = yodleeServiceConsumer.transactionCategoriesList(apiVersion, baseUrl, cobrandName, cobrandLevel, userLevel, yodleeUserToken);
+
+                if (cobrandLevel) {
+                    CobrandLoginResponse resp = getCobrandSessionToken();
+                    jwtBusinessService.AuditLogging(companyId, ROLE_COMPANY, request.getRemoteAddr(), AUDIT_USER_CATEGORY_LIST + "/cobrandLevel" + "/" + username + "/" + SUCCESS);
+                    Object obj = yodleeServiceConsumer.transactionCategoriesList(apiVersion, baseUrl, cobrandName, cobrandLevel, userLevel, resp.getSession().getCobSession());
                     return ResponseEntity.ok(obj);
+                } else if (userLevel) {
+                    if (username != EMPTY && jwtBusinessService.checkCompanyIdAndLoginNameIsValid(companyId, username) != 0) {
+                        if(jwtBusinessService.userIsActive(username)) {
+                            String args[] = getArgs("");
+                            YodleeJwtTokenGenerate tokenYodleeGenerator = new YodleeJwtTokenGenerate(args);
+                            String yodleeUserToken = tokenYodleeGenerator.generateJwtYodlee(false, username);
+                            jwtBusinessService.AuditLogging(companyId, ROLE_COMPANY, request.getRemoteAddr(), AUDIT_USER_CATEGORY_LIST + "/userLevel" + "/" + username + "/" + SUCCESS);
+                            Object obj = yodleeServiceConsumer.transactionCategoriesList(apiVersion, baseUrl, cobrandName, cobrandLevel, userLevel, yodleeUserToken);
+                            return ResponseEntity.ok(obj);
+                        } else {
+                            return getErrorResponseEntity(USER_INACTIVE_STATE, ERROR_CODE_401, HttpStatus.UNAUTHORIZED);
+                        }
+                    } else {
+                        jwtBusinessService.AuditLogging(companyId, ROLE_COMPANY, request.getRemoteAddr(), AUDIT_USER_CATEGORY_LIST + "/userLevel" + "/" + username + "/" + INVALID_NAME_COMPANY);
+                        return getErrorResponseEntity(INVALID_NAME_COMPANY, ERROR_CODE_400, HttpStatus.BAD_REQUEST);
+                    }
                 } else {
-                    jwtBusinessService.AuditLogging(companyId, ROLE_COMPANY, request.getRemoteAddr(), AUDIT_USER_CATEGORY_LIST + "/userLevel" + "/" + username + "/" + INVALID_NAME_COMPANY);
-                    return getErrorResponseEntity(INVALID_NAME_COMPANY, ERROR_CODE_400, HttpStatus.BAD_REQUEST);
+                    CobrandLoginResponse resp = getCobrandSessionToken();
+                    jwtBusinessService.AuditLogging(companyId, ROLE_COMPANY, request.getRemoteAddr(), AUDIT_USER_CATEGORY_LIST + "/cobrandLevel" + "/" + username + "/" + SUCCESS);
+                    Object obj = yodleeServiceConsumer.transactionCategoriesList(apiVersion, baseUrl, cobrandName, true, false, resp.getSession().getCobSession());
+                    return ResponseEntity.ok(obj);
                 }
-            } else {
-                CobrandLoginResponse resp = getCobrandSessionToken();
-                jwtBusinessService.AuditLogging(companyId, ROLE_COMPANY, request.getRemoteAddr(), AUDIT_USER_CATEGORY_LIST + "/cobrandLevel" + "/" + username + "/" + SUCCESS);
-                Object obj = yodleeServiceConsumer.transactionCategoriesList(apiVersion, baseUrl, cobrandName, true, false, resp.getSession().getCobSession());
-                return ResponseEntity.ok(obj);
-            }
 
         } else {
             return getErrorResponseEntity(COMPANY_ACCESS, ERROR_CODE_400, HttpStatus.BAD_REQUEST);
@@ -481,26 +649,30 @@ public class JwtAuthenticationController extends Constants {
             if (jwtBusinessService.getRoleAccess() == ROLE_COMPANY) {
                 int companyId = jwtBusinessService.getCompanyId();
                 if (categoriesRuleCreateRequest.getUsername() != EMPTY && jwtBusinessService.checkCompanyIdAndLoginNameIsValid(companyId, categoriesRuleCreateRequest.getUsername()) != 0) {
-                    String apiVersion = env.getProperty(APP_VERSION);
-                    String baseUrl = env.getProperty(BASE_URL);
-                    String args[] = getArgs("");
-                    YodleeJwtTokenGenerate tokenYodleeGenerator = new YodleeJwtTokenGenerate(args);
-                    String yodleeUserToken = tokenYodleeGenerator.generateJwtYodlee(false, categoriesRuleCreateRequest.getUsername());
-                    String cobrandName = jwtBusinessService.getCobrandName();
-                    ErrorResponse response = yodleeServiceConsumer.categoriesRuleCreate(apiVersion, baseUrl, cobrandName, yodleeUserToken, categoriesRuleCreateRequest);
-                    if (response != null && response.getErroCode().equalsIgnoreCase(ERROR_CODE_200)) {
-                        jwtBusinessService.AuditLogging(companyId, ROLE_COMPANY, request.getRemoteAddr(), AUDIT_USER_RULE_CREATE + "/" + categoriesRuleCreateRequest.getUsername() + "/" + TRANSACTION_CATEGORY_RULE_CREATED);
-                        return getSuccessResponseEntity(TRANSACTION_CATEGORY_RULE_CREATED);
-                    } else {
-                        if (response.getErroCode().equalsIgnoreCase(ERROR_CODE_400)) {
-                            jwtBusinessService.AuditLogging(companyId, ROLE_COMPANY, request.getRemoteAddr(), AUDIT_USER_RULE_CREATE + "/" + categoriesRuleCreateRequest.getUsername() + "/" + response.getErroMessage());
-                            return new ResponseEntity<Object>(
-                                    response, new HttpHeaders(), HttpStatus.BAD_REQUEST);
+                    if(jwtBusinessService.userIsActive(categoriesRuleCreateRequest.getUsername())) {
+                        String apiVersion = env.getProperty(APP_VERSION);
+                        String baseUrl = env.getProperty(BASE_URL);
+                        String args[] = getArgs("");
+                        YodleeJwtTokenGenerate tokenYodleeGenerator = new YodleeJwtTokenGenerate(args);
+                        String yodleeUserToken = tokenYodleeGenerator.generateJwtYodlee(false, categoriesRuleCreateRequest.getUsername());
+                        String cobrandName = jwtBusinessService.getCobrandName();
+                        ErrorResponse response = yodleeServiceConsumer.categoriesRuleCreate(apiVersion, baseUrl, cobrandName, yodleeUserToken, categoriesRuleCreateRequest);
+                        if (response != null && response.getErroCode().equalsIgnoreCase(ERROR_CODE_200)) {
+                            jwtBusinessService.AuditLogging(companyId, ROLE_COMPANY, request.getRemoteAddr(), AUDIT_USER_RULE_CREATE + "/" + categoriesRuleCreateRequest.getUsername() + "/" + TRANSACTION_CATEGORY_RULE_CREATED);
+                            return getSuccessResponseEntity(TRANSACTION_CATEGORY_RULE_CREATED);
                         } else {
-                            jwtBusinessService.AuditLogging(companyId, ROLE_COMPANY, request.getRemoteAddr(), AUDIT_USER_RULE_CREATE + "/" + categoriesRuleCreateRequest.getUsername() + "/" + response.getErroMessage());
-                            return new ResponseEntity<Object>(
-                                    response, new HttpHeaders(), HttpStatus.UNAUTHORIZED);
+                            if (response.getErroCode().equalsIgnoreCase(ERROR_CODE_400)) {
+                                jwtBusinessService.AuditLogging(companyId, ROLE_COMPANY, request.getRemoteAddr(), AUDIT_USER_RULE_CREATE + "/" + categoriesRuleCreateRequest.getUsername() + "/" + response.getErroMessage());
+                                return new ResponseEntity<Object>(
+                                        response, new HttpHeaders(), HttpStatus.BAD_REQUEST);
+                            } else {
+                                jwtBusinessService.AuditLogging(companyId, ROLE_COMPANY, request.getRemoteAddr(), AUDIT_USER_RULE_CREATE + "/" + categoriesRuleCreateRequest.getUsername() + "/" + response.getErroMessage());
+                                return new ResponseEntity<Object>(
+                                        response, new HttpHeaders(), HttpStatus.UNAUTHORIZED);
+                            }
                         }
+                    } else {
+                        return getErrorResponseEntity(USER_INACTIVE_STATE, ERROR_CODE_401, HttpStatus.UNAUTHORIZED);
                     }
                 } else {
                     jwtBusinessService.AuditLogging(companyId, ROLE_COMPANY, request.getRemoteAddr(), AUDIT_USER_RULE_CREATE + "/" + categoriesRuleCreateRequest.getUsername() + "/" + INVALID_NAME_COMPANY);
@@ -524,15 +696,19 @@ public class JwtAuthenticationController extends Constants {
         if (jwtBusinessService.getRoleAccess() == ROLE_COMPANY) {
             int companyId = jwtBusinessService.getCompanyId();
             if (username != EMPTY && jwtBusinessService.checkCompanyIdAndLoginNameIsValid(companyId, username) != 0) {
-                String apiVersion = env.getProperty(APP_VERSION);
-                String baseUrl = env.getProperty(BASE_URL);
-                String args[] = getArgs("");
-                YodleeJwtTokenGenerate tokenYodleeGenerator = new YodleeJwtTokenGenerate(args);
-                String yodleeUserToken = tokenYodleeGenerator.generateJwtYodlee(false, username);
-                String cobrandName = jwtBusinessService.getCobrandName();
-                Object obj = yodleeServiceConsumer.getUserRuleList(apiVersion, baseUrl, cobrandName, yodleeUserToken);
-                jwtBusinessService.AuditLogging(companyId, ROLE_COMPANY, request.getRemoteAddr(), AUDIT_USER_RULE_LIST + "/" + username + "/" + SUCCESS);
-                return ResponseEntity.ok(obj);
+                if(jwtBusinessService.userIsActive(username)) {
+                    String apiVersion = env.getProperty(APP_VERSION);
+                    String baseUrl = env.getProperty(BASE_URL);
+                    String args[] = getArgs("");
+                    YodleeJwtTokenGenerate tokenYodleeGenerator = new YodleeJwtTokenGenerate(args);
+                    String yodleeUserToken = tokenYodleeGenerator.generateJwtYodlee(false, username);
+                    String cobrandName = jwtBusinessService.getCobrandName();
+                    Object obj = yodleeServiceConsumer.getUserRuleList(apiVersion, baseUrl, cobrandName, yodleeUserToken);
+                    jwtBusinessService.AuditLogging(companyId, ROLE_COMPANY, request.getRemoteAddr(), AUDIT_USER_RULE_LIST + "/" + username + "/" + SUCCESS);
+                    return ResponseEntity.ok(obj);
+                } else {
+                    return getErrorResponseEntity(USER_INACTIVE_STATE, ERROR_CODE_401, HttpStatus.UNAUTHORIZED);
+                }
             } else {
                 jwtBusinessService.AuditLogging(companyId, ROLE_COMPANY, request.getRemoteAddr(), AUDIT_USER_RULE_LIST + "/" + username + "/" + INVALID_NAME_COMPANY);
                 return getErrorResponseEntity(INVALID_NAME_COMPANY, ERROR_CODE_400, HttpStatus.BAD_REQUEST);
@@ -555,15 +731,19 @@ public class JwtAuthenticationController extends Constants {
         if (jwtBusinessService.getRoleAccess() == ROLE_COMPANY) {
             int companyId = jwtBusinessService.getCompanyId();
             if (username != EMPTY && jwtBusinessService.checkCompanyIdAndLoginNameIsValid(companyId, username) != 0) {
-                String apiVersion = env.getProperty(APP_VERSION);
-                String baseUrl = env.getProperty(BASE_URL);
-                String args[] = getArgs("");
-                YodleeJwtTokenGenerate tokenYodleeGenerator = new YodleeJwtTokenGenerate(args);
-                String yodleeUserToken = tokenYodleeGenerator.generateJwtYodlee(false, username);
-                String cobrandName = jwtBusinessService.getCobrandName();
-                Object obj = yodleeServiceConsumer.runCategorizationRule(apiVersion, baseUrl, cobrandName, yodleeUserToken, ruleId);
-                jwtBusinessService.AuditLogging(companyId, ROLE_COMPANY, request.getRemoteAddr(), AUDIT_USER_RULE_RUN + "/" + username + "/" + SUCCESS);
-                return ResponseEntity.ok(obj);
+                if(jwtBusinessService.userIsActive(username)) {
+                    String apiVersion = env.getProperty(APP_VERSION);
+                    String baseUrl = env.getProperty(BASE_URL);
+                    String args[] = getArgs("");
+                    YodleeJwtTokenGenerate tokenYodleeGenerator = new YodleeJwtTokenGenerate(args);
+                    String yodleeUserToken = tokenYodleeGenerator.generateJwtYodlee(false, username);
+                    String cobrandName = jwtBusinessService.getCobrandName();
+                    Object obj = yodleeServiceConsumer.runCategorizationRule(apiVersion, baseUrl, cobrandName, yodleeUserToken, ruleId);
+                    jwtBusinessService.AuditLogging(companyId, ROLE_COMPANY, request.getRemoteAddr(), AUDIT_USER_RULE_RUN + "/" + username + "/" + SUCCESS);
+                    return ResponseEntity.ok(obj);
+                } else {
+                    return getErrorResponseEntity(USER_INACTIVE_STATE, ERROR_CODE_401, HttpStatus.UNAUTHORIZED);
+                }
             } else {
                 jwtBusinessService.AuditLogging(companyId, ROLE_COMPANY, request.getRemoteAddr(), AUDIT_USER_RULE_RUN + "/" + username + "/" + INVALID_NAME_COMPANY);
                 return getErrorResponseEntity(INVALID_NAME_COMPANY, ERROR_CODE_400, HttpStatus.BAD_REQUEST);

@@ -41,5 +41,7 @@ public interface UserRepository extends JpaRepository<TableUserRegistration, Int
     List<TableUserRegistration> findByCompanyId(int companyId);
 
     TableUserRegistration findByCompanyIdAndLoginName(int companyID, String username);
+
+    TableUserRegistration findByLoginNameAndStatus(String loginName, String status);
 }
 

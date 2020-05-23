@@ -46,6 +46,16 @@ public class YodleeServiceConsumer extends Constants {
     private static final Logger logger = LoggerFactory.getLogger(YodleeServiceConsumer.class);
 
     /**
+     * @param str
+     * @return True returns not empty
+     */
+    public static boolean isNullOrEmpty(String str) {
+        if (str != null && !str.isEmpty())
+            return true;
+        return false;
+    }
+
+    /**
      * @param baseUrl
      * @param apiVersion
      * @param cobrandName
@@ -114,6 +124,45 @@ public class YodleeServiceConsumer extends Constants {
             UserRegisterResponse userRegisterResponse = new UserRegisterResponse();
             userRegisterResponse.setErrorResponse(errorResponse);
             return userRegisterResponse;
+        }
+    }
+
+    public JSONObject userEdit(String baseUrl, String apiVersion, String cobrandName, String yodleeUserToken, UserEditRequest userEditRequest) {
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.add(API_VERSION, apiVersion);
+            headers.add(AUTHORIZATION, BEARER + yodleeUserToken);
+            headers.add(COBRAND_NAME, cobrandName);
+            RestTemplate restTemplate = new RestTemplate();
+            EditUserRequestYodlee editUserRequestYodlee = new EditUserRequestYodlee();
+            editUserRequestYodlee.setUser(userEditRequest.getUser());
+
+            HttpEntity entity = new HttpEntity(editUserRequestYodlee, headers);
+            ResponseEntity<JSONObject> response = restTemplate.exchange(
+                    baseUrl + "/ysl/user", HttpMethod.PUT, entity, JSONObject.class);
+            return response.getBody();
+        } catch (HttpStatusCodeException exception) {
+            logger.info("FAILED:/ysl/user/edit:" + exception.getMessage());
+            int statusCode = exception.getStatusCode().value();
+            if (statusCode == 401) {
+                JSONObject respObj = new JSONObject();
+                respObj.put("message", "User Edit Failed:"+exception.getMessage());
+                respObj.put("status_code", "401");
+                return respObj;
+            } else if (statusCode == 400) {
+                JSONObject respObj = new JSONObject();
+                respObj.put("message", "User Edit Failed:"+exception.getMessage());
+                respObj.put("status_code", "400");
+                return respObj;
+            } else if (statusCode == 204) {
+                JSONObject respObj = new JSONObject();
+                respObj.put("message", "User details updated");
+                respObj.put("status_code", "200");
+                return respObj;
+            } else {
+                return null;
+            }
         }
     }
 
@@ -506,4 +555,6 @@ public class YodleeServiceConsumer extends Constants {
 
         }
     }
+
+
 }

@@ -23,6 +23,30 @@ public class TableUserRegistration {
     @Column
     private String password;
     @Column
+    private String address;
+    @Column
+    private String state;
+    @Column
+    private String city;
+    @Column
+    private String zip;
+    @Column
+    private String country;
+    @Column
+    private String fname;
+    @Column
+    private String lname;
+    @Column
+    private String currency;
+    @Column
+    private String dateFormat;
+    @Column
+    private String timeZone;
+    @Column
+    private String locale;
+    @Column
+    private String status;
+    @Column
     private String createdAt;
     @Column
     private String updatedAt;
@@ -72,6 +96,89 @@ public class TableUserRegistration {
         this.companyId = companyId;
     }
 
+    public String getAddress() {
+        return address;
+    }
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getState() {
+        return state;
+    }
+    public void setState(String state) {
+        this.state = state;
+    }
+
+    public String getCity() {
+        return city;
+    }
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getTimeZone() {
+        return timeZone;
+    }
+    public void setTimeZone(String timeZone) {
+        this.timeZone = timeZone;
+    }
+
+    public String getDateFormat() {
+        return dateFormat;
+    }
+    public void setDateFormat(String dateFormat) {
+        this.dateFormat = dateFormat;
+    }
+
+    public String getZip() {
+        return zip;
+    }
+    public void setZip(String zip) {
+        this.zip = zip;
+    }
+
+    public String getFname() {
+        return fname;
+    }
+    public void setFname(String fname) {
+        this.fname = fname;
+    }
+
+    public String getLocale() {
+        return locale;
+    }
+    public void setLocale(String locale) {
+        this.locale = locale;
+    }
+
+    public String getCurrency() {
+        return currency;
+    }
+    public void setCurrency(String currency) {
+        this.currency = currency;
+    }
+
+    public String getLname() {
+        return lname;
+    }
+    public void setLname(String lname) {
+        this.lname = lname;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+    public void setStatus(String status) {
+        this.status = status;
+    }
 
     public String getCreatedAt() {
         return createdAt;
