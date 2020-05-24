@@ -238,7 +238,7 @@ public class JwtAuthenticationController extends Constants {
                         }
                     } else {
                         long createdIdInYodlee = userRegisterResp.getUser().getId();
-                        jwtBusinessService.registerUserInDB(companyId, createdIdInYodlee, userRegisterResp);
+                        jwtBusinessService.registerUserInDB(companyId, createdIdInYodlee, userRegisterRequest);
                         jwtBusinessService.AuditLogging(companyId, ROLE_COMPANY, request.getRemoteAddr(), AUDIT_USER_CREATE + "/" + SUCCESS);
                         return ResponseEntity.ok(userRegisterResp);
                     }

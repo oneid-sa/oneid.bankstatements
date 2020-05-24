@@ -426,20 +426,26 @@ public class JwtBusinessService extends Constants implements UserDetailsService 
      * @param companyId
      * @param userRegisterResponse
      */
-    public void registerUserInDB(int companyId, long createdYodleeId, UserRegisterResponse userRegisterResponse) {
+    public void registerUserInDB(int companyId, long createdYodleeId, UserRegisterRequest userRegisterResponse) {
         TableUserRegistration userRegistration = new TableUserRegistration();
         userRegistration.setCompanyId(companyId);
         userRegistration.setLoginName(userRegisterResponse.getUser().getLoginName());
         userRegistration.setPassword(userRegisterResponse.getUser().getPassword());
         userRegistration.setEmail(userRegisterResponse.getUser().getEmail());
-        userRegistration.setAddress(userRegisterResponse.getUser().getAddress().getAddress1());
-        userRegistration.setZip(userRegisterResponse.getUser().getAddress().getZip());
-        userRegistration.setCountry(userRegisterResponse.getUser().getAddress().getCountry());
-        userRegistration.setState(userRegisterResponse.getUser().getAddress().getState());
-        userRegistration.setFname(userRegisterResponse.getUser().getName().getFirst());
-        userRegistration.setLname(userRegisterResponse.getUser().getName().getLast());
-        userRegistration.setCurrency(userRegisterResponse.getUser().getPreferences().getCurrency());
-        userRegistration.setLocale(userRegisterResponse.getUser().getPreferences().getLocale());
+        if(userRegisterResponse.getUser().getAddress() != null) {
+            userRegistration.setAddress(userRegisterResponse.getUser().getAddress().getAddress1());
+            userRegistration.setZip(userRegisterResponse.getUser().getAddress().getZip());
+            userRegistration.setCountry(userRegisterResponse.getUser().getAddress().getCountry());
+            userRegistration.setState(userRegisterResponse.getUser().getAddress().getState());
+        }
+        if(userRegisterResponse.getUser().getName() != null) {
+            userRegistration.setFname(userRegisterResponse.getUser().getName().getFirst());
+            userRegistration.setLname(userRegisterResponse.getUser().getName().getLast());
+        }
+        if(userRegisterResponse.getUser().getPreferences() != null) {
+            userRegistration.setCurrency(userRegisterResponse.getUser().getPreferences().getCurrency());
+            userRegistration.setLocale(userRegisterResponse.getUser().getPreferences().getLocale());
+        }
         userRegistration.setCreatedAt(currentDateTime());
         userRegistration.setUpdatedAt(currentDateTime());
         userRegistration.setCreatedYodleeId(createdYodleeId);
