@@ -449,6 +449,7 @@ public class JwtBusinessService extends Constants implements UserDetailsService 
         userRegistration.setCreatedAt(currentDateTime());
         userRegistration.setUpdatedAt(currentDateTime());
         userRegistration.setCreatedYodleeId(createdYodleeId);
+        userRegistration.setStatus(ACTIVE_STATUS);
         userDao.save(userRegistration);
     }
 
@@ -583,7 +584,7 @@ public class JwtBusinessService extends Constants implements UserDetailsService 
     }
 
     public boolean userIsActive(String loginName) {
-        TableUserRegistration tabel = userDao.findByLoginNameAndStatus(loginName,"Y");
+        TableUserRegistration tabel = userDao.findByLoginNameAndStatus(loginName,ACTIVE_STATUS);
         if(tabel != null)
             return true;
         else

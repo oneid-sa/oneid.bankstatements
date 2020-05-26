@@ -71,7 +71,7 @@ public class JwtAuthenticationController extends Constants {
         if (isNullOrEmpty(authenticationRequest.getUsername()) && isNullOrEmpty(authenticationRequest.getPassword())) {
             TableCompanyInfo companyInfo = jwtBusinessService.getCompanyInfo(authenticationRequest.getUsername());
             if (companyInfo != null) {
-                if(companyInfo.getStatus().equalsIgnoreCase("Y")) {
+                if(companyInfo.getStatus().equalsIgnoreCase(ACTIVE_STATUS)) {
                     if (companyInfo.getUsername().equalsIgnoreCase(authenticationRequest.getUsername())) {
                         if (companyInfo.getPassword().equalsIgnoreCase(authenticationRequest.getPassword())) {
                             String jwtToken = jwtTokenUtil.generateToken(jwtBusinessService.getUserDetails(authenticationRequest.getUsername(), authenticationRequest.getPassword()));
@@ -183,9 +183,9 @@ public class JwtAuthenticationController extends Constants {
         if (jwtBusinessService.getRoleAccess() == ROLE_CLIENT) {
             if(isNullOrEmpty(companyID)) {
                 if(jwtBusinessService.companyIdExist(companyID)) {
-                    if(action.equalsIgnoreCase("Y") || action.equalsIgnoreCase("N")) {
+                    if(action.equalsIgnoreCase(ACTIVE_STATUS) || action.equalsIgnoreCase(INACTIVE_STATUS)) {
                         jwtBusinessService.changeCompanyStatus(Integer.parseInt(companyID), action);
-                        if(action.equalsIgnoreCase("Y")) {
+                        if(action.equalsIgnoreCase(ACTIVE_STATUS)) {
                             jwtBusinessService.AuditLogging(Integer.parseInt(companyID), ROLE_CLIENT, request.getRemoteAddr(), AUDIT_COMPANY_STATUS + "/"+companyID+ "/" + COMPANY_ACTIVATED);
                             return getSuccessResponseEntity(COMPANY_ACTIVATED);
                         }
@@ -311,10 +311,10 @@ public class JwtAuthenticationController extends Constants {
         if (jwtBusinessService.getRoleAccess() == ROLE_COMPANY) {
             if(isNullOrEmpty(userId)) {
                 if(jwtBusinessService.userIdExist(Integer.parseInt(userId))) {
-                    if(action.equalsIgnoreCase("Y") || action.equalsIgnoreCase("N")) {
+                    if(action.equalsIgnoreCase(ACTIVE_STATUS) || action.equalsIgnoreCase(INACTIVE_STATUS)) {
                         int companyId = jwtBusinessService.getCompanyId();
                         jwtBusinessService.changeUserStatus(Integer.parseInt(userId), action);
-                        if(action.equalsIgnoreCase("Y")) {
+                        if(action.equalsIgnoreCase(ACTIVE_STATUS)) {
                             jwtBusinessService.AuditLogging(companyId, ROLE_CLIENT, request.getRemoteAddr(), AUDIT_USER_STATUS + "/"+userId+ "/" + COMPANY_ACTIVATED);
                             return getSuccessResponseEntity(USER_ACTIVATED);
                         }

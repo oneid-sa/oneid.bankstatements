@@ -75,6 +75,8 @@ public class Constants {
     public String INVALID_ACTION_STATUS = "Invalid action status found...";
     public String INVALID_USER_ID = "Invalid user id found.";
     public String USER_UPDATED_SUCCESS = "User updated successfully..";
+    public String ACTIVE_STATUS = "Y";
+    public String INACTIVE_STATUS = "N";
     public String EMAIL = "email";
     public String NAME = "name";
     public String FIRSTNAME = "first";
