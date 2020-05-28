@@ -1,11 +1,15 @@
 package digital.oneid.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import java.util.List;
 
 /**
  * Created by hubinotech on 04/05/20.
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class CategoryRulesList {
+
     private int userDefinedRuleId;
 
     private int memId;

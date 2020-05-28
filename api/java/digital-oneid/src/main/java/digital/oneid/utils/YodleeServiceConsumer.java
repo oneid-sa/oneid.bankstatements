@@ -375,12 +375,23 @@ public class YodleeServiceConsumer extends Constants {
             headers.add(COBRAND_NAME, cobrandName);
             HttpEntity entity = new HttpEntity(headers);
             RestTemplate restTemplate = new RestTemplate();
-            ResponseEntity<TransactionCategoryList> response = restTemplate.exchange(
-                    baseUrl + "/ysl/transactions/categories", HttpMethod.GET, entity, TransactionCategoryList.class);
+            ResponseEntity<String> response = restTemplate.exchange(
+                    baseUrl + "/ysl/transactions/categories", HttpMethod.GET, entity, String.class);
 
             System.out.println(response.getStatusCode());
             System.out.println(response.getBody());
-            return response.getBody();
+            if(response.getBody().length() > 10) {
+                Gson g = new Gson();
+                TransactionCategoryList arr = g.fromJson(response.getBody().toString(), TransactionCategoryList.class);
+                return arr;
+            } else {
+                SuccessResponse successResponse = new SuccessResponse();
+                successResponse.setStatus("Success");
+                successResponse.setMessage("{}");
+                successResponse.setStatusCode(200);
+                return successResponse;
+            }
+
         } catch (HttpStatusCodeException exception) {
             logger.info("FAILED:/ysl/transactions/categories/list:" + exception.getResponseBodyAsString());
             Gson g = new Gson();
@@ -482,12 +493,22 @@ public class YodleeServiceConsumer extends Constants {
             headers.add(COBRAND_NAME, cobrandName);
             HttpEntity entity = new HttpEntity(headers);
             RestTemplate restTemplate = new RestTemplate();
-            ResponseEntity<CategoryRulesList[]> response = restTemplate.exchange(
-                    baseUrl + "/ysl/transactions/categories/rules", HttpMethod.GET, entity, CategoryRulesList[].class);
+            ResponseEntity<String> response = restTemplate.exchange(
+                    baseUrl + "/ysl/transactions/categories/rules", HttpMethod.GET, entity, String.class);
 
             System.out.println(response.getStatusCode());
             System.out.println(response.getBody());
-            return response.getBody();
+            if(response.getBody().length() > 10) {
+                Gson g = new Gson();
+                CategoryRulesList[] arr = g.fromJson(response.getBody().toString(), CategoryRulesList[].class);
+                return arr;
+            } else {
+                SuccessResponse successResponse = new SuccessResponse();
+                successResponse.setStatus("Success");
+                successResponse.setMessage("{}");
+                successResponse.setStatusCode(200);
+                return successResponse;
+            }
         } catch (HttpStatusCodeException exception) {
             logger.info("FAILED:/ysl/transactions/categories/list:" + exception.getResponseBodyAsString());
             Gson g = new Gson();
