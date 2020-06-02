@@ -127,6 +127,52 @@ public class YodleeServiceConsumer extends Constants {
         }
     }
 
+    /**
+     * @param baseUrl
+     * @param apiVersion
+     * @param cobrandName
+     * @param cobrandSessionToken
+     * @param loginName
+     * @return
+     */
+    public int userUnregister(String baseUrl, String apiVersion, String cobrandName, String cobrandSessionToken, String loginName, String yodleeUserJwtToken) {
+        try {
+            /*HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.add(API_VERSION, apiVersion);
+            headers.add(AUTHORIZATION, COBSESSION + cobrandSessionToken);
+            headers.add(COBRAND_NAME, cobrandName);
+            RestTemplate restTemplate = new RestTemplate();
+            HttpEntity entity = new HttpEntity(headers);*/
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.add(API_VERSION, apiVersion);
+
+            headers.add(AUTHORIZATION, BEARER + yodleeUserJwtToken);
+            headers.add(COBRAND_NAME, cobrandName);
+            HttpEntity entity = new HttpEntity(headers);
+            RestTemplate restTemplate = new RestTemplate();
+            //ResponseEntity<UserUnregisterResponse> response = restTemplate.exchange(
+            //        baseUrl + "/ysl/user/unregister/" + loginName, HttpMethod.DELETE, entity, UserUnregisterResponse.class);
+            ResponseEntity<JSONObject> response = restTemplate.exchange(
+                    baseUrl + "/ysl/user/unregister?loginname" + loginName, HttpMethod.DELETE, entity, JSONObject.class);
+            return response.getStatusCodeValue();
+        } catch (HttpStatusCodeException exception) {
+            logger.info("FAILED:/ysl/user/unregister:" + exception.getMessage());
+            Gson g = new Gson();
+            ErrorResponse errorResponse = g.fromJson(exception.getResponseBodyAsString(), ErrorResponse.class);
+            int statusCode = exception.getStatusCode().value();
+            if (statusCode == 401) {
+                errorResponse.setErroCode(String.valueOf(statusCode));
+            } else if (statusCode == 400) {
+                errorResponse.setErroCode(String.valueOf(statusCode));
+            }
+            UserUnregisterResponse userUnregisterResponse = new UserUnregisterResponse();
+            userUnregisterResponse.setErrorResponse(errorResponse);
+            return 500;
+        }
+    }
+
     public JSONObject userEdit(String baseUrl, String apiVersion, String cobrandName, String yodleeUserToken, UserEditRequest userEditRequest) {
         try {
             HttpHeaders headers = new HttpHeaders();

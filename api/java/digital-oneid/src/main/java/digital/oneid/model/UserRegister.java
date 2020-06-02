@@ -3,6 +3,8 @@ package digital.oneid.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+import java.util.UUID;
+
 /**
  * Created by hubinotech on 25/03/20.
  */
@@ -10,6 +12,11 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class UserRegister {
+
+    public UserRegister()
+    {
+        uniqueReference = UUID.randomUUID().toString();
+    }
 
     private String loginName;
 
@@ -20,6 +27,9 @@ public class UserRegister {
     private String email;
 
     private String password;
+
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private String uniqueReference;
 
     private Name name;
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
@@ -52,6 +62,12 @@ public class UserRegister {
     }
     public Name getName(){
         return this.name;
+    }
+    public String getUniqueReference(){
+        return this.uniqueReference;
+    }
+    public void setUniqueReference(String UniqueReference){
+        this.uniqueReference = UniqueReference;
     }
     public void setAddress(Address address){
         this.address = address;

@@ -52,6 +52,8 @@ public class TableUserRegistration {
     private String updatedAt;
     @Column
     private long createdYodleeId;
+    @Column
+    private String uniquereference;
 
     public String getLoginName() {
         return loginName;
@@ -80,6 +82,13 @@ public class TableUserRegistration {
     }
     public void setId(int id) {
         this.id = id;
+    }
+
+    public void setUniqueReference(String UniqueReference) {
+        this.uniquereference = UniqueReference;
+    }
+    public String getUniqueReference() {
+        return this.uniquereference;
     }
 
     public long getCreatedYodleeId() {

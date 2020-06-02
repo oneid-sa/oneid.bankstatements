@@ -12,6 +12,17 @@ public class CategoriesRuleCreateRequest {
     private String source;
     private int priority;
     private List<RuleClause> ruleClause;
+    private String uniqueidentifier;
+
+    public void setUniqueidentifier(String UniqueIdentifier)
+    {
+        uniqueidentifier = UniqueIdentifier;
+    }
+
+    public String getUniqueidentifier()
+    {
+        return uniqueidentifier;
+    }
 
     public long getCategoryId() {
         return categoryId;

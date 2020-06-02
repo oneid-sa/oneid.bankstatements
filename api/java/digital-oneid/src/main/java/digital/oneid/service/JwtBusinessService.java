@@ -10,6 +10,7 @@ import digital.oneid.Respository.*;
 import digital.oneid.model.*;
 import digital.oneid.security.BCryptPasswordEncoder;
 import digital.oneid.utils.Constants;
+import digital.oneid.utils.PasswordGenerator;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -42,6 +43,26 @@ import java.util.List;
 
 @Service
 public class JwtBusinessService extends Constants implements UserDetailsService {
+
+    PasswordGenerator passwordGenerator;
+
+    public JwtBusinessService()
+    {
+        passwordGenerator = new PasswordGenerator.PasswordGeneratorBuilder()
+                .useDigits(true)
+                .useLower(true)
+                .useUpper(true)
+                .usePunctuation(true)
+                .repeatingCaharactersAllowed(false)
+                .build();
+    }
+
+    public String generatePassword(int Length)
+    {
+        return passwordGenerator.generateYodleeSpecific(Length);
+    }
+
+
 
     String authorization_username = "";
     String authorize_jwttoken = "";
@@ -153,8 +174,8 @@ public class JwtBusinessService extends Constants implements UserDetailsService 
      * @param yodleeToken
      * @param expiryHour
      */
-    public void insertYodleeToken(TableYodleeJwtToken existTokenInfo, String yodleeToken, int expiryHour) {
-        int user_id = userDao.GetUserId(authorization_username);
+    public void insertYodleeToken(TableYodleeJwtToken existTokenInfo, String yodleeToken, int expiryHour, String uniquereference) {
+        int user_id = userDao.GetUserId(authorization_username, uniquereference);
         long expirytime = generate_tokens_expiry_time(expiryHour);
         TableYodleeJwtToken tokenInfo = new TableYodleeJwtToken();
         tokenInfo.setUserId(user_id);
@@ -170,8 +191,8 @@ public class JwtBusinessService extends Constants implements UserDetailsService 
      * @return YodleeJwtTokenInfo
      * @throws UsernameNotFoundException
      */
-    public TableYodleeJwtToken getYodleeTokenInfo() throws UsernameNotFoundException {
-        int user_id = userDao.GetUserId(authorization_username);
+    public TableYodleeJwtToken getYodleeTokenInfo(String uniquereference) throws UsernameNotFoundException {
+        int user_id = userDao.GetUserId(authorization_username, uniquereference);
         TableYodleeJwtToken tokenInfo = jwtTokenRepository.findByUid(user_id);
         return tokenInfo;
     }
@@ -188,6 +209,11 @@ public class JwtBusinessService extends Constants implements UserDetailsService 
             return true;
         else
             return false;
+    }
+
+    public Boolean UserRecordExist(String username, String uniquereference) {
+        int recordcount = userDao.UserRecordExists(username, uniquereference);
+        return recordcount > 0;
     }
 
     /**
@@ -361,8 +387,8 @@ public class JwtBusinessService extends Constants implements UserDetailsService 
             return false;
     }
 
-    public int getUserIdByName(String username) {
-        return userDao.GetUserId(username);
+    public int getUserIdByName(String username, String uniquereference) {
+        return userDao.GetUserId(username, uniquereference);
     }
 
     /**
@@ -402,6 +428,11 @@ public class JwtBusinessService extends Constants implements UserDetailsService 
         return jsonObject;
     }
 
+    public String getCompanySpecificAccountholderId(String AccountHolderId)
+    {
+        return getCompanyId() + "-" + AccountHolderId;
+    }
+
     /**
      * @return
      */
@@ -414,8 +445,8 @@ public class JwtBusinessService extends Constants implements UserDetailsService 
      * @param username
      * @return
      */
-    public int checkCompanyIdAndLoginNameIsValid(int companyID, String username) {
-        TableUserRegistration tableUserRegistration = userDao.findByCompanyIdAndLoginName(companyID, username);
+    public int checkCompanyIdAndLoginNameAndUniquereferenceIsValid(int companyID, String username, String uniquereference) {
+        TableUserRegistration tableUserRegistration = userDao.findByCompanyIdAndLoginNameAndUniquereference(companyID, username, uniquereference);
         if (tableUserRegistration != null)
             return tableUserRegistration.getId();
         else
@@ -427,30 +458,36 @@ public class JwtBusinessService extends Constants implements UserDetailsService 
      * @param userRegisterResponse
      */
     public void registerUserInDB(int companyId, long createdYodleeId, UserRegisterRequest userRegisterResponse) {
-        TableUserRegistration userRegistration = new TableUserRegistration();
-        userRegistration.setCompanyId(companyId);
-        userRegistration.setLoginName(userRegisterResponse.getUser().getLoginName());
-        userRegistration.setPassword(userRegisterResponse.getUser().getPassword());
-        userRegistration.setEmail(userRegisterResponse.getUser().getEmail());
-        if(userRegisterResponse.getUser().getAddress() != null) {
-            userRegistration.setAddress(userRegisterResponse.getUser().getAddress().getAddress1());
-            userRegistration.setZip(userRegisterResponse.getUser().getAddress().getZip());
-            userRegistration.setCountry(userRegisterResponse.getUser().getAddress().getCountry());
-            userRegistration.setState(userRegisterResponse.getUser().getAddress().getState());
+        try {
+            TableUserRegistration userRegistration = new TableUserRegistration();
+            userRegistration.setCompanyId(companyId);
+            userRegistration.setLoginName(userRegisterResponse.getUser().getLoginName());
+            userRegistration.setPassword(userRegisterResponse.getUser().getPassword());
+            userRegistration.setEmail(userRegisterResponse.getUser().getEmail());
+            userRegistration.setUniqueReference(userRegisterResponse.getUser().getUniqueReference());
+            if (userRegisterResponse.getUser().getAddress() != null) {
+                userRegistration.setAddress(userRegisterResponse.getUser().getAddress().getAddress1());
+                userRegistration.setZip(userRegisterResponse.getUser().getAddress().getZip());
+                userRegistration.setCountry(userRegisterResponse.getUser().getAddress().getCountry());
+                userRegistration.setState(userRegisterResponse.getUser().getAddress().getState());
+            }
+            if (userRegisterResponse.getUser().getName() != null) {
+                userRegistration.setFname(userRegisterResponse.getUser().getName().getFirst());
+                userRegistration.setLname(userRegisterResponse.getUser().getName().getLast());
+            }
+            if (userRegisterResponse.getUser().getPreferences() != null) {
+                userRegistration.setCurrency(userRegisterResponse.getUser().getPreferences().getCurrency());
+                userRegistration.setLocale(userRegisterResponse.getUser().getPreferences().getLocale());
+            }
+            userRegistration.setCreatedAt(currentDateTime());
+            userRegistration.setUpdatedAt(currentDateTime());
+            userRegistration.setCreatedYodleeId(createdYodleeId);
+            userRegistration.setStatus(ACTIVE_STATUS);
+            userDao.save(userRegistration);
+        } catch (Exception e)
+        {
+            throw e;
         }
-        if(userRegisterResponse.getUser().getName() != null) {
-            userRegistration.setFname(userRegisterResponse.getUser().getName().getFirst());
-            userRegistration.setLname(userRegisterResponse.getUser().getName().getLast());
-        }
-        if(userRegisterResponse.getUser().getPreferences() != null) {
-            userRegistration.setCurrency(userRegisterResponse.getUser().getPreferences().getCurrency());
-            userRegistration.setLocale(userRegisterResponse.getUser().getPreferences().getLocale());
-        }
-        userRegistration.setCreatedAt(currentDateTime());
-        userRegistration.setUpdatedAt(currentDateTime());
-        userRegistration.setCreatedYodleeId(createdYodleeId);
-        userRegistration.setStatus(ACTIVE_STATUS);
-        userDao.save(userRegistration);
     }
 
     public void updateUserInDB(UserEditRequest userEditRequest) {
@@ -496,10 +533,10 @@ public class JwtBusinessService extends Constants implements UserDetailsService 
      * @param categoryName
      * @param parentCategoryId
      */
-    public void insertTransactionCategoryDB(int companyId, String username, String categoryName, long parentCategoryId) {
+    public void insertTransactionCategoryDB(int companyId, String username, String categoryName, long parentCategoryId, String uniquereference) {
         TableTransactionCategory tableTransactionCategory = new TableTransactionCategory();
         tableTransactionCategory.setCompanyId(companyId);
-        tableTransactionCategory.setUserId(getUserIdByName(username));
+        tableTransactionCategory.setUserId(getUserIdByName(username, uniquereference));
         tableTransactionCategory.setCategoryName(categoryName);
         tableTransactionCategory.setParentId(parentCategoryId);
         tableTransactionCategory.setCreatedAt(currentDateTime());
@@ -576,6 +613,10 @@ public class JwtBusinessService extends Constants implements UserDetailsService 
         return userDao.existsById(userId);
     }
 
+    public boolean userExists(String LoginName, String UniqueReference) {
+        return (userDao.UserRecordExists(LoginName, UniqueReference) > 0);
+    }
+
     public void changeUserStatus(int id, String action) {
         TableUserRegistration tableUser = userDao.getOne(id);
         tableUser.setStatus(action);
@@ -583,13 +624,15 @@ public class JwtBusinessService extends Constants implements UserDetailsService 
         userDao.save(tableUser);
     }
 
-    public boolean userIsActive(String loginName) {
-        TableUserRegistration tabel = userDao.findByLoginNameAndStatus(loginName,ACTIVE_STATUS);
+    public boolean userIsActive(String loginName,String uniqueIdentifier) {
+        TableUserRegistration tabel = userDao.findByLoginNameAndUniquereferenceAndStatus(loginName, uniqueIdentifier, ACTIVE_STATUS);
         if(tabel != null)
             return true;
         else
             return false;
     }
+
+
 
     public String getUsername(int userId) {
         TableUserRegistration reg = userDao.getOne(userId);

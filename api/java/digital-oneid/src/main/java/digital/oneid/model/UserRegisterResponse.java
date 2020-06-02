@@ -12,6 +12,8 @@ public class UserRegisterResponse {
     private UserRegister user;
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private ErrorResponse errorResponse;
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+
     public void setUser(UserRegister user){
         this.user = user;
     }

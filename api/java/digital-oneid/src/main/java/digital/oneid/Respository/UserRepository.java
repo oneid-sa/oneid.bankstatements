@@ -25,9 +25,11 @@ public interface UserRepository extends JpaRepository<TableUserRegistration, Int
 
     TableUserRegistration findByLoginName(String username);
 
-    @Query(value = "SELECT id FROM user_accounts WHERE login_name=?1", nativeQuery = true)
-    int GetUserId(String username);
+    @Query(value = "SELECT id FROM user_accounts WHERE login_name=?1 and uniquereference=?2", nativeQuery = true)
+    int GetUserId(String username, String uniquereference);
 
+    @Query(value = "SELECT count(id) as idcount FROM user_accounts WHERE login_name=?1 and uniquereference=?2", nativeQuery = true)
+    int UserRecordExists(String username, String uniquereference);
 
     @Query(value = "SELECT login_name FROM user_accounts WHERE role_id=?1", nativeQuery = true)
     List<String> GetUserList(int role);
@@ -40,8 +42,8 @@ public interface UserRepository extends JpaRepository<TableUserRegistration, Int
 
     List<TableUserRegistration> findByCompanyId(int companyId);
 
-    TableUserRegistration findByCompanyIdAndLoginName(int companyID, String username);
+    TableUserRegistration findByCompanyIdAndLoginNameAndUniquereference(int companyID, String username, String uniquereference);
 
-    TableUserRegistration findByLoginNameAndStatus(String loginName, String status);
+    TableUserRegistration findByLoginNameAndUniquereferenceAndStatus(String loginName, String UniqueReference, String status);
 }
 

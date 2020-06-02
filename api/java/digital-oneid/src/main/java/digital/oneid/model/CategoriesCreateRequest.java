@@ -8,6 +8,17 @@ public class CategoriesCreateRequest {
     private String username;
     private String categoryName;
     private long parentCategoryId;
+    private String uniqueidentifier;
+
+    public void setUniqueidentifier(String UniqueIdentifier)
+    {
+        uniqueidentifier = UniqueIdentifier;
+    }
+
+    public String getUniqueidentifier()
+    {
+        return uniqueidentifier;
+    }
 
     public String getUsername() {
         return username;

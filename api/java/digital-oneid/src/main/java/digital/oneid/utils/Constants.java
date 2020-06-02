@@ -48,6 +48,8 @@ public class Constants {
     public String COMPANY_ACCESS = "Invalid token found. Only company credentials have access to make this API call...";
     public String INVALID_NAME_COMPANY = "Invalid username found for this company...";
     public String TRANSACTION_CATEGORY_CREATED = "Transaction category created successfully...";
+    public String ERROR_END_ACCOUNTHOLDER_SESSION = "An error occured when attempting to end account holder session !";
+    public String INVALID_TRANSACTION_RESULT = "No transactions has been returned for this request ...";
     public String TRANSACTION_CATEGORY_RULE_CREATED = "Transaction categorization rule created successfully...";
     public String AUDIT_AUTH = "AUTH";
     public String AUDIT_COMPANY_CREATE = "COMPANY-CREATE";
