@@ -290,7 +290,7 @@ public class YodleeServiceConsumer extends Constants {
      * @param toDate
      * @return
      */
-    public Object getTransactionInfo(String baseUrl, String apiVersion, String cobrandName, String yodleeUserJwtToken,
+    public ResponseEntity<JSONObject> getTransactionInfo(String baseUrl, String apiVersion, String cobrandName, String yodleeUserJwtToken,
                                      long accountId, String container, String fromDate, String toDate, String categoryId, String categoryType,String highLevelCategoryId) {
         try {
             String params = "categoryId="+categoryId+"&accountId=" + accountId + "&container=" + container + "&fromDate=" + fromDate + "&toDate=" + toDate+"&categoryType="+categoryType+"&highLevelCategoryId="+highLevelCategoryId;
@@ -306,7 +306,7 @@ public class YodleeServiceConsumer extends Constants {
 
             System.out.println(response.getStatusCode());
             System.out.println(response.getBody());
-            return response.getBody();
+            return response;
         } catch (HttpStatusCodeException exception) {
             logger.info("FAILED:/ysl/transactions:" + exception.getResponseBodyAsString());
             Gson g = new Gson();
@@ -317,7 +317,8 @@ public class YodleeServiceConsumer extends Constants {
             } else if (statusCode == 400) {
                 errorResponse.setErroCode(String.valueOf(statusCode));
             }
-            return errorResponse;
+            ResponseEntity<JSONObject> httpErrorResponse = new ResponseEntity<JSONObject>(exception.getStatusCode());
+            return httpErrorResponse;
         }
     }
 

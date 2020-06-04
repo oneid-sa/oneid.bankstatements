@@ -594,32 +594,39 @@ public class JwtAuthenticationController extends Constants {
                             UserUnregisterRequest userUnregisterRequest = new UserUnregisterRequest();
                             userUnregisterRequest.setAccountHolderIdentifier(AccountTransactionsRequestValue.getAccountHolderIdentifier());
 
-                            Object transactionsObject = yodleeServiceConsumer.getTransactionInfo(baseUrl, apiVersion, cobrandName, yodleeUserToken, Long.parseLong(AccountTransactionsRequestValue.getAccountid()), AccountTransactionsRequestValue.getContainer(), AccountTransactionsRequestValue.getFromDate(), AccountTransactionsRequestValue.getToDate(), AccountTransactionsRequestValue.getCategoryId(), AccountTransactionsRequestValue.getCategoryType(), AccountTransactionsRequestValue.getHighLevelCategoryId());
+                            ResponseEntity<net.minidev.json.JSONObject> transactionsResponseObject = yodleeServiceConsumer.getTransactionInfo(baseUrl, apiVersion, cobrandName, yodleeUserToken, Long.parseLong(AccountTransactionsRequestValue.getAccountid()), AccountTransactionsRequestValue.getContainer(), AccountTransactionsRequestValue.getFromDate(), AccountTransactionsRequestValue.getToDate(), AccountTransactionsRequestValue.getCategoryId(), AccountTransactionsRequestValue.getCategoryType(), AccountTransactionsRequestValue.getHighLevelCategoryId());
 
-                            if (transactionsObject instanceof ErrorResponse)
+
+                            if (transactionsResponseObject.getStatusCodeValue() == 200) {
+
+                                Object transactionsObject = transactionsResponseObject.getBody();
+
+                                if (transactionsObject instanceof ErrorResponse) {
+                                    ErrorResponse errorResponse = (ErrorResponse) transactionsObject;
+                                    return getErrorResponseEntity(errorResponse.getErroMessage(), errorResponse.getErroCode(), HttpStatus.BAD_REQUEST);
+                                }
+
+                                if (transactionsObject == null) {
+                                    return getErrorResponseEntity(INVALID_TRANSACTION_RESULT, ERROR_CODE_400, HttpStatus.BAD_REQUEST);
+                                }
+                                JSONObject jsonObject = new JSONObject(transactionsObject);
+
+                                if (jsonObject.isEmpty()) {
+                                    return getErrorResponseEntity(INVALID_TRANSACTION_RESULT, ERROR_CODE_400, HttpStatus.BAD_REQUEST);
+                                }
+
+                                int statusCode = yodleeServiceConsumer.userUnregister(baseUrl, apiVersion, cobrandName, cobrandSessionTokenInfo.getSession().getCobSession(), AccountTransactionsRequestValue.getAccountHolderIdentifier(), yodleeUserToken);
+
+                                if (statusCode == 204) {
+                                    jwtBusinessService.changeUserStatus(jwtBusinessService.getUserIdByName(AccountTransactionsRequestValue.getAccountHolderIdentifier(), AccountTransactionsRequestValue.getUniqueReference()), "C");
+                                    //jwtBusinessService.updateUserInDB(userEditRequest);
+                                }
+                                return ResponseEntity.ok(transactionsObject);
+                            } else
                             {
-                                ErrorResponse errorResponse = (ErrorResponse)transactionsObject;
-                                return getErrorResponseEntity(errorResponse.getErroMessage(), errorResponse.getErroCode(), HttpStatus.BAD_REQUEST);
+                                return getErrorResponseEntity(transactionsResponseObject.getStatusCode().getReasonPhrase(), Integer.toString(transactionsResponseObject.getStatusCodeValue()), transactionsResponseObject.getStatusCode());
                             }
 
-                            if (transactionsObject == null)
-                            {
-                                return getErrorResponseEntity(INVALID_TRANSACTION_RESULT, ERROR_CODE_400, HttpStatus.BAD_REQUEST);
-                            }
-                            JSONObject jsonObject = new JSONObject(transactionsObject);
-
-                            if (jsonObject.isEmpty())
-                            {
-                                return getErrorResponseEntity(INVALID_TRANSACTION_RESULT, ERROR_CODE_400, HttpStatus.BAD_REQUEST);
-                            }
-
-                            int statusCode = yodleeServiceConsumer.userUnregister(baseUrl, apiVersion, cobrandName, cobrandSessionTokenInfo.getSession().getCobSession(),AccountTransactionsRequestValue.getAccountHolderIdentifier(), yodleeUserToken);
-
-                            if (statusCode == 204) {
-                                jwtBusinessService.changeUserStatus(jwtBusinessService.getUserIdByName(AccountTransactionsRequestValue.getAccountHolderIdentifier(), AccountTransactionsRequestValue.getUniqueReference()), "C");
-                                //jwtBusinessService.updateUserInDB(userEditRequest);
-                            }
-                            return ResponseEntity.ok(transactionsObject);
                         } else {
                             jwtBusinessService.AuditLogging(companyId, ROLE_COMPANY, request.getRemoteAddr(), AUDIT_USER_TRANSACTION + "/" + AccountTransactionsRequestValue.getAccountHolderIdentifier() + "/" + AccountTransactionsRequestValue.getAccountHolderIdentifier()  +"/" + AccountTransactionsRequestValue.getAccountid() + "/" + INVALID_NAME_COMPANY);
                             return getErrorResponseEntity(INVALID_NAME_COMPANY, ERROR_CODE_400, HttpStatus.BAD_REQUEST);
