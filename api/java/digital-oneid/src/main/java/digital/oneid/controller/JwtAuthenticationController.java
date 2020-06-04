@@ -7,7 +7,6 @@
 package digital.oneid.controller;
 
 import com.google.gson.Gson;
-import digital.oneid.Respository.UserRepository;
 import digital.oneid.model.*;
 import digital.oneid.security.JwtTokenUtil;
 import digital.oneid.service.JwtBusinessService;
@@ -25,9 +24,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.web.bind.annotation.*;
 
-import javax.persistence.Convert;
 import javax.servlet.http.HttpServletRequest;
-import java.awt.*;
 
 /**
  * JwtAuthenticationController annotation indicates that the annotated class is a controller.
@@ -219,7 +216,11 @@ public class JwtAuthenticationController extends Constants {
      * @throws Exception
      */
     @RequestMapping(value = "/api/company/user/register", method = RequestMethod.POST)
-    public ResponseEntity<?> userRegister(@RequestBody UserRegisterRequest userRegisterRequest, HttpServletRequest request) throws Exception {
+    public ResponseEntity<?> userRegister(@RequestBody NewSessionRequest NewSessionRequestValue, HttpServletRequest request) throws Exception {
+        UserRegisterRequest userRegisterRequest = new UserRegisterRequest();
+        userRegisterRequest.setUser(new UserRegister());
+        userRegisterRequest.getUser().setLoginName(NewSessionRequestValue.getAccountHolderIdentifier());
+        userRegisterRequest.getUser().setEmail(NewSessionRequestValue.getEmailAddress());
         if (isNullOrEmpty(userRegisterRequest.getUser().getLoginName()) && isNullOrEmpty(userRegisterRequest.getUser().getEmail()) /*&& isNullOrEmpty(userRegisterRequest.getUser().getPassword())*/) {
             if (jwtBusinessService.getRoleAccess() == ROLE_COMPANY) {
                 String apiVersion = env.getProperty(APP_VERSION);
@@ -254,7 +255,11 @@ public class JwtAuthenticationController extends Constants {
                         jwtBusinessService.AuditLogging(companyId, ROLE_COMPANY, request.getRemoteAddr(), AUDIT_USER_CREATE + "/" + SUCCESS);
                         userRegisterResp.getUser().setUniqueReference(uniqueReference);
                         userRegisterResp.getUser().setLoginName(username);
-                        return ResponseEntity.ok(userRegisterResp);
+                        NewSessionResponse newSessionResponse = new NewSessionResponse();
+                        newSessionResponse.setAccountHolderIdentifier(username);
+                        newSessionResponse.setUniqueReference(uniqueReference);
+                        newSessionResponse.setStatus("SUCCESS");
+                        return ResponseEntity.ok(newSessionResponse);
                     }
                 } else {
                     int companyId = jwtBusinessService.getCompanyId();
@@ -525,14 +530,14 @@ public class JwtAuthenticationController extends Constants {
                             String args[] = getArgs("");
                             YodleeJwtTokenGenerate tokenYodleeGenerator = new YodleeJwtTokenGenerate(args);
                             String yodleeToken = tokenYodleeGenerator.generateJwtYodlee(false, jwtBusinessService.getCompanySpecificAccountholderId(AccountHolderRequestDetailsValue.getAccountHolderIdentifier()));
-                            FastlinkResponse fastlinkResponse = new FastlinkResponse();
-                            fastlinkResponse.setFastLink(env.getProperty(FASTLINK));
-                            fastlinkResponse.setFinAppid(Long.parseLong(env.getProperty(FINAPPID)));
-                            fastlinkResponse.setFastLinkJwtToken(yodleeToken);
-                            fastlinkResponse.setRedirectReq(Boolean.parseBoolean(env.getProperty(REDIRECTREQ)));
-                            fastlinkResponse.setCallbackUrl(env.getProperty(CALBACKURL));
+                            ClientBankLoginCredentialsResponse clientBankLoginCredentialsResponse = new ClientBankLoginCredentialsResponse();
+                            //clientBankLoginCredentialsResponse.setFastLink(env.getProperty(FASTLINK));
+                            //clientBankLoginCredentialsResponse.setFinAppid(Long.parseLong(env.getProperty(FINAPPID)));
+                            clientBankLoginCredentialsResponse.setJwtToken(yodleeToken);
+                            //clientBankLoginCredentialsResponse.setRedirectReq(Boolean.parseBoolean(env.getProperty(REDIRECTREQ)));
+                            //clientBankLoginCredentialsResponse.setCallbackUrl(env.getProperty(CALBACKURL));
                             jwtBusinessService.AuditLogging(companyId, ROLE_COMPANY, request.getRemoteAddr(), AUDIT_USER_FASTLINK + "/" + AccountHolderRequestDetailsValue.getAccountHolderIdentifier() + "/" + AccountHolderRequestDetailsValue.getUniqueReference() + "/" + SUCCESS);
-                            return ResponseEntity.ok(fastlinkResponse);
+                            return ResponseEntity.ok(clientBankLoginCredentialsResponse);
                         } else {
                             jwtBusinessService.AuditLogging(companyId, ROLE_COMPANY, request.getRemoteAddr(), AUDIT_USER_FASTLINK + "/" + AccountHolderRequestDetailsValue.getAccountHolderIdentifier() + "/" + AccountHolderRequestDetailsValue.getUniqueReference() + "/" + INVALID_NAME_COMPANY);
                             return getErrorResponseEntity(INVALID_NAME_COMPANY, ERROR_CODE_400, HttpStatus.BAD_REQUEST);
