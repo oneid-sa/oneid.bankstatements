@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+
+<title>Bank Login</title>
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+</head>
+<body>
+
+<div id="iframediv" style="position: absolute; top: 0; left: 0;width: 100%;height: 100%;" hidden>
+<iframe name="postiFrame" id="frame1" style="position: absolute; top: 0; left: 0;width: 100%;height: 100%;"></iframe>
+</div>
+<div style="max-width: 1000px;margin: auto;background: white;padding: 10px;">
+<form action="https://ukyinode.stage.yodleedeveloper.uk/authenticate/private-vreport-stage?channelAppName=ukyi" method="POST" id="rsessionPost" target="postiFrame"> 
+<div id="maindiv" class="content" style="max-width: 1000px;margin: auto;background: white;padding: 10px;">
+<img src="SmallLogo.jpg"></img>
+<h1><b>Please click on proceed to continue to Bank Login. After you have logged in please click on close to complete linking of account(s)</b></h1><br />
+
+<table hidden>	
+	<tr>   
+		<td>JWT Token</td>
+		<td>::</td> 
+		<td>	<input type="text" name="jwtToken" value="Bearer eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1OTEyNjI0NzMsImlhdCI6MTU5MTI2MDY3MywiaXNzIjoiMDA5OGU1OTgtYzdhN2Q2NjItYjE1OS00Yjk5LThkNDUtMDg3ZGFiOWJlYzAzIiwic3ViIjoiMi03NzEyMTY1MDQyMDg5In0.dn-qI3UGROzHOnU7861cDIAcF7qSgNkZYT5kHDIVqtlCuM1Lwc608Rzpb0eX9210OCLIqD2yxG2zTblDwXA29fbuRjdn9Tu9C8xxpDSdsOBt6C9qtdlHAbqXyg5gdifoWOTpDQ-gMR2aYhCcEtg3QC0KESvRdZelSv80rNj92DYML4B4KzteLtTlPZ8VDbKRH7wVwPZNRRKgHXU7sYS9N87R93dUVnNb9B1cPyc6SLQI8YSmt2oc6DoWeUgU4Qz3sRRAKs3o9kOovg3AMG04eATyI5_5HPmOozbpxtDv9mc5xTL-C5QWKY5G6jGqUTu7N9AW3uPDXCg7IY2OIbTJdg" />	</td>
+	</tr>
+	
+	<tr>   
+		<td>FinAppId's</td>
+		<td>::</td> 
+		<td>	<input type="text" name="app" value="10003600" />	</td>
+	</tr>
+	
+	<tr>
+		<td>RedirectReq</td>
+		<td>::</td> 
+		<td>	<input type="text" name="redirectReq" value="true"/>	</td>
+	</tr>
+
+	<tr>
+		<td>Extra Params</td>
+		<td>::</td> 
+		<td>	<input type='text' name='extraParams' value='callback=https://google.co.in'/>	</td>
+	</tr> 
+</table>
+	
+	<input type="submit" name="Submit" value="Proceed" style = "font-size:20px"/>
+</form>
+</div>
+</div>
+<!-- <script>document.getElementById('rsessionPost').submit();</script>
+ -->
+ <script>
+alert("prepping");
+var form = document.getElementById("rsessionPost");
+
+if(form.attachEvent) {
+alert("attachEvent");
+  form.attachEvent("submit", submitForm);
+
+} else {
+alert("addEventListener");
+  form.addEventListener("submit", submitForm);
+}
+
+function submitForm(e) {
+  if(e.preventDefault) {
+    e.preventDefault();
+  }
+
+	$(maindiv).hide();
+	$(iframediv).show();
+  this.target = "postiFrame";
+  this.submit();
+      /*var iframes = document.querySelectorAll("iframe");
+    for( var i = 0; i < iframes.length; i++) {
+        resizeIFrameToFitContent( iframes[i] );
+    }*/
+	/*
+  var secondForm = this.cloneNode();
+  secondForm.target = "second_iframe";
+  secondForm.submit();*/
+  
+}
+function resizeIFrameToFitContent( iFrame ) {
+	alert("resizing");
+    iFrame.width  = iFrame.contentWindow.document.body.scrollWidth;
+    iFrame.height = iFrame.contentWindow.document.body.scrollHeight;
+}
+
+window.addEventListener('DOMContentLoaded', function(e) {
+
+    var iFrame = document.getElementById( 'iFrame1' );
+    resizeIFrameToFitContent( iFrame );
+
+    // or, to resize all iframes:
+    var iframes = document.querySelectorAll("iframe");
+    for( var i = 0; i < iframes.length; i++) {
+        resizeIFrameToFitContent( iframes[i] );
+    }
+} );
+</script>
+ 
+ </body>
+</html>

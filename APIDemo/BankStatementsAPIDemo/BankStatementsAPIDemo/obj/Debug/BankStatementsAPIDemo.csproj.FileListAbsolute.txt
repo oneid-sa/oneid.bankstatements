@@ -1,0 +1,11 @@
+C:\Development\OneID\DemoApps\CSharp\BankStatements\APIDemo\BankStatementsAPIDemo\BankStatementsAPIDemo\obj\Debug\BankStatementsAPIDemo.MainForm.resources
+C:\Development\OneID\DemoApps\CSharp\BankStatements\APIDemo\BankStatementsAPIDemo\BankStatementsAPIDemo\obj\Debug\BankStatementsAPIDemo.Properties.Resources.resources
+C:\Development\OneID\DemoApps\CSharp\BankStatements\APIDemo\BankStatementsAPIDemo\BankStatementsAPIDemo\obj\Debug\BankStatementsAPIDemo.csproj.GenerateResource.cache
+C:\Development\OneID\DemoApps\CSharp\BankStatements\APIDemo\BankStatementsAPIDemo\BankStatementsAPIDemo\bin\Debug\BankStatementsAPIDemo.exe.config
+C:\Development\OneID\DemoApps\CSharp\BankStatements\APIDemo\BankStatementsAPIDemo\BankStatementsAPIDemo\bin\Debug\BankStatementsAPIDemo.exe
+C:\Development\OneID\DemoApps\CSharp\BankStatements\APIDemo\BankStatementsAPIDemo\BankStatementsAPIDemo\bin\Debug\BankStatementsAPIDemo.pdb
+C:\Development\OneID\DemoApps\CSharp\BankStatements\APIDemo\BankStatementsAPIDemo\BankStatementsAPIDemo\bin\Debug\Newtonsoft.Json.dll
+C:\Development\OneID\DemoApps\CSharp\BankStatements\APIDemo\BankStatementsAPIDemo\BankStatementsAPIDemo\bin\Debug\Newtonsoft.Json.xml
+C:\Development\OneID\DemoApps\CSharp\BankStatements\APIDemo\BankStatementsAPIDemo\BankStatementsAPIDemo\obj\Debug\BankStatementsAPIDemo.csproj.CopyComplete
+C:\Development\OneID\DemoApps\CSharp\BankStatements\APIDemo\BankStatementsAPIDemo\BankStatementsAPIDemo\obj\Debug\BankStatementsAPIDemo.exe
+C:\Development\OneID\DemoApps\CSharp\BankStatements\APIDemo\BankStatementsAPIDemo\BankStatementsAPIDemo\obj\Debug\BankStatementsAPIDemo.pdb

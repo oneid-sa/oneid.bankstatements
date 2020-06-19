@@ -1,0 +1,12 @@
+C:\Development\OneID\DemoApps\CSharp\BankStatements\APIDemo\BankStatementsAPIDemo\BankStatementsAPIDemo\bin\Debug\Simplif.iBankStatementsAPIDemo.exe.config
+C:\Development\OneID\DemoApps\CSharp\BankStatements\APIDemo\BankStatementsAPIDemo\BankStatementsAPIDemo\bin\Debug\Simplif.iBankStatementsAPIDemo.exe
+C:\Development\OneID\DemoApps\CSharp\BankStatements\APIDemo\BankStatementsAPIDemo\BankStatementsAPIDemo\bin\Debug\Simplif.iBankStatementsAPIDemo.pdb
+C:\Development\OneID\DemoApps\CSharp\BankStatements\APIDemo\BankStatementsAPIDemo\BankStatementsAPIDemo\bin\Debug\Newtonsoft.Json.dll
+C:\Development\OneID\DemoApps\CSharp\BankStatements\APIDemo\BankStatementsAPIDemo\BankStatementsAPIDemo\bin\Debug\Newtonsoft.Json.xml
+C:\Development\OneID\DemoApps\CSharp\BankStatements\APIDemo\BankStatementsAPIDemo\BankStatementsAPIDemo\obj\Debug\Simplifi.BankStatementsAPIDemo.MainForm.resources
+C:\Development\OneID\DemoApps\CSharp\BankStatements\APIDemo\BankStatementsAPIDemo\BankStatementsAPIDemo\obj\Debug\Simplifi.BankStatementsAPIDemo.MessageForm.resources
+C:\Development\OneID\DemoApps\CSharp\BankStatements\APIDemo\BankStatementsAPIDemo\BankStatementsAPIDemo\obj\Debug\Simplifi.BankStatementsAPIDemo.Properties.Resources.resources
+C:\Development\OneID\DemoApps\CSharp\BankStatements\APIDemo\BankStatementsAPIDemo\BankStatementsAPIDemo\obj\Debug\Simplifi.BankStatementsAPIDemo.csproj.GenerateResource.cache
+C:\Development\OneID\DemoApps\CSharp\BankStatements\APIDemo\BankStatementsAPIDemo\BankStatementsAPIDemo\obj\Debug\Simplifi.BankStatementsAPIDemo.csproj.CopyComplete
+C:\Development\OneID\DemoApps\CSharp\BankStatements\APIDemo\BankStatementsAPIDemo\BankStatementsAPIDemo\obj\Debug\Simplif.iBankStatementsAPIDemo.exe
+C:\Development\OneID\DemoApps\CSharp\BankStatements\APIDemo\BankStatementsAPIDemo\BankStatementsAPIDemo\obj\Debug\Simplif.iBankStatementsAPIDemo.pdb

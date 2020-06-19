@@ -1,0 +1,86 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="BankTransactionAPIDemo.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="BankStatementsURL" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">http://integration.simplifi.solutions:8080/api</Value>
+    </Setting>
+    <Setting Name="AutoLogin" Type="System.Boolean" Scope="Application">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="UserName" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">hubino-india</Value>
+    </Setting>
+    <Setting Name="Password" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Hubino@123</Value>
+    </Setting>
+    <Setting Name="SecurityURL" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">http://integration.simplifi.solutions:8080/api</Value>
+    </Setting>
+    <Setting Name="ShowErrorMessageDetail" Type="System.Boolean" Scope="Application">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="HTMLTemplate" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;BankLogin&lt;/title&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;
+    &lt;link rel="icon" type="image/x-icon" href="favicon.ico"&gt;
+    &lt;link rel="stylesheet" href="css/styles.css"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;bank-login
+      jwt-token="Bearer param1"&gt;
+    &lt;/bank-login&gt;
+    &lt;script type="text/javascript" src="https://integration.simplifi.solutions/bankstatements/pages/bank-login-component/js/bank-login-es2015.js"&gt;&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</Value>
+    </Setting>
+    <Setting Name="JSTemplate" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">&lt;script type='text/javascript' src='https://cdn.yodlee.com/fastlink/v3/initialize.js'&gt;&lt;/script&gt;
+&lt;body&gt;
+
+&lt;div id="container-fastlink"&gt;
+	&lt;div style="text-align: center;"&gt;
+   &lt;input type="submit" id="btn-fastlink" value="Link an Account"&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;script&gt;
+	(function (window) {
+					//Open FastLink
+					var fastlinkBtn = document.getElementById('btn-fastlink');
+					fastlinkBtn.addEventListener('click', function () {
+							window.fastlink.open({
+									fastLinkURL: 'param1',
+									accessToken: 'Bearer param2',
+									params: {
+									              userExperienceFlow : 'Aggregation'
+                                    },
+									onSuccess: function (data) {
+											console.log(data);
+									},
+									onError: function (data) {
+											console.log(data);
+									},
+									onExit: function (data) {
+											console.log(data);
+									},
+									onEvent: function (data) {
+											console.log(data);
+									}
+							}, 'container-fastlink');
+					}, false);
+			}(window));
+	&lt;/script&gt;
+&lt;/body&gt;</Value>
+    </Setting>
+    <Setting Name="SaveJSON" Type="System.Boolean" Scope="Application">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>
