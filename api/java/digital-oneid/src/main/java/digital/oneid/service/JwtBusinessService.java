@@ -409,6 +409,7 @@ public class JwtBusinessService extends Constants implements UserDetailsService 
         tableCompanyInfo.setAddress(companyCreateRequest.getAddress());
         tableCompanyInfo.setPassword(companyCreateRequest.getPassword());
         tableCompanyInfo.setRoleId(2);
+        tableCompanyInfo.setStatus("Y");
         tableCompanyInfo.setCreatedAt(currentDateTime());
         tableCompanyInfo.setUpdatedAt(currentDateTime());
         companyInfoRepository.save(tableCompanyInfo);

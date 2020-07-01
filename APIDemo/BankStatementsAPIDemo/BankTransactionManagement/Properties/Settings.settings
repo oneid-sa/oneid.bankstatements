@@ -1,0 +1,27 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="BankTransactionManagement.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="BankStatementsURL" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">http://localhost:8070/api</Value>
+    </Setting>
+    <Setting Name="AutoLogin" Type="System.Boolean" Scope="Application">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="UserName" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">vreport-stage</Value>
+    </Setting>
+    <Setting Name="Password" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">VFD@nb62pkd</Value>
+    </Setting>
+    <Setting Name="SecurityURL" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">http://localhost:8070/api</Value>
+    </Setting>
+    <Setting Name="SaveJSON" Type="System.Boolean" Scope="Application">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="ShowErrorMessageDetail" Type="System.Boolean" Scope="Application">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

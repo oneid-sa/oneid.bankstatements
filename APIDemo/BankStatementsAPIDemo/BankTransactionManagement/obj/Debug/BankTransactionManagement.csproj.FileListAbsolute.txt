@@ -1,0 +1,14 @@
+C:\Development\OneID\github\oneid.bankstatements\APIDemo\BankStatementsAPIDemo\BankTransactionManagement\obj\Debug\BankTransactionManagement.Mainform.resources
+C:\Development\OneID\github\oneid.bankstatements\APIDemo\BankStatementsAPIDemo\BankTransactionManagement\obj\Debug\BankTransactionManagement.Properties.Resources.resources
+C:\Development\OneID\github\oneid.bankstatements\APIDemo\BankStatementsAPIDemo\BankTransactionManagement\obj\Debug\BankTransactionManagement.csproj.GenerateResource.cache
+C:\Development\OneID\github\oneid.bankstatements\APIDemo\BankStatementsAPIDemo\BankTransactionManagement\obj\Debug\BankTransactionManagement.MessageForm.resources
+C:\Development\OneID\github\oneid.bankstatements\APIDemo\BankStatementsAPIDemo\BankTransactionManagement\bin\Debug\BankTransactionManagement.exe.config
+C:\Development\OneID\github\oneid.bankstatements\APIDemo\BankStatementsAPIDemo\BankTransactionManagement\bin\Debug\BankTransactionManagement.exe
+C:\Development\OneID\github\oneid.bankstatements\APIDemo\BankStatementsAPIDemo\BankTransactionManagement\bin\Debug\BankTransactionManagement.pdb
+C:\Development\OneID\github\oneid.bankstatements\APIDemo\BankStatementsAPIDemo\BankTransactionManagement\bin\Debug\Newtonsoft.Json.dll
+C:\Development\OneID\github\oneid.bankstatements\APIDemo\BankStatementsAPIDemo\BankTransactionManagement\bin\Debug\Newtonsoft.Json.xml
+C:\Development\OneID\github\oneid.bankstatements\APIDemo\BankStatementsAPIDemo\BankTransactionManagement\obj\Debug\BankTransactionManagement.csproj.CopyComplete
+C:\Development\OneID\github\oneid.bankstatements\APIDemo\BankStatementsAPIDemo\BankTransactionManagement\obj\Debug\BankTransactionManagement.exe
+C:\Development\OneID\github\oneid.bankstatements\APIDemo\BankStatementsAPIDemo\BankTransactionManagement\obj\Debug\BankTransactionManagement.pdb
+C:\Development\OneID\github\oneid.bankstatements\APIDemo\BankStatementsAPIDemo\BankTransactionManagement\obj\Debug\BankTransactionManagement.AddUpdateUser.resources
+C:\Development\OneID\github\oneid.bankstatements\APIDemo\BankStatementsAPIDemo\BankTransactionManagement\obj\Debug\BankTransactionManagement.csprojAssemblyReference.cache
