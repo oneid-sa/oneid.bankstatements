@@ -25,7 +25,7 @@ namespace BankTransactionManagement.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("http://localhost:8070/api")]
+        [global::System.Configuration.DefaultSettingValueAttribute("http://integration.simplifi.solutions:8080/api")]
         public string BankStatementsURL {
             get {
                 return ((string)(this["BankStatementsURL"]));
@@ -61,7 +61,7 @@ namespace BankTransactionManagement.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("http://localhost:8070/api")]
+        [global::System.Configuration.DefaultSettingValueAttribute("http://integration.simplifi.solutions:8080/api")]
         public string SecurityURL {
             get {
                 return ((string)(this["SecurityURL"]));

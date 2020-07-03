@@ -141,7 +141,69 @@ namespace BankTransactionManagement
 
         private void exportButton_Click(object sender, EventArgs e)
         {
+            if (companiesDataGridView.Rows.Count > 0)
+            {
+                SaveFileDialog sfd = new SaveFileDialog();
+                sfd.Filter = "CSV (*.csv)|*.csv";
+                sfd.FileName = "simplificompaniesexport.csv";
+                bool fileError = false;
+                if (sfd.ShowDialog() == DialogResult.OK)
+                {
+                    if (File.Exists(sfd.FileName))
+                    {
+                        try
+                        {
+                            File.Delete(sfd.FileName);
+                        }
+                        catch (IOException ex)
+                        {
+                            fileError = true;
+                            MessageBox.Show("It wasn't possible to write the data to the disk." + ex.Message);
+                        }
+                    }
+                    if (!fileError)
+                    {
+                        try
+                        {
+                            // Choose whether to write header. Use EnableWithoutHeaderText instead to omit header.
+                            companiesDataGridView.ClipboardCopyMode = DataGridViewClipboardCopyMode.EnableAlwaysIncludeHeaderText;
+                            // Select all the cells
+                            companiesDataGridView.SelectAll();
+                            // Copy selected cells to DataObject
+                            DataObject dataObject = companiesDataGridView.GetClipboardContent();
+                            // Get the text of the DataObject, and serialize it to a file
+                            File.WriteAllText(sfd.FileName, dataObject.GetText(TextDataFormat.CommaSeparatedValue));
+                            //int columnCount = transactionListDataGridView.Columns.Count;
+                            //string columnNames = "";
+                            //string[] outputCsv = new string[transactionListDataGridView.Rows.Count + 1];
+                            //for (int i = 0; i < columnCount; i++)
+                            //{
+                            //    columnNames += transactionListDataGridView.Columns[i].HeaderText.ToString() + ",";
+                            //}
+                            //outputCsv[0] += columnNames;
 
+                            //for (int i = 1; (i - 1) < transactionListDataGridView.Rows.Count; i++)
+                            //{
+                            //    for (int j = 0; j < columnCount; j++)
+                            //    {
+                            //        outputCsv[i] += transactionListDataGridView.Rows[i - 1].Cells[j].Value.ToString() + ",";
+                            //    }
+                            //}
+
+                            //File.WriteAllLines(sfd.FileName, outputCsv, Encoding.UTF8);
+                            MessageBox.Show("Data Exported Successfully !!!", "Info");
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show("Error :" + ex.Message);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                MessageBox.Show("No Data To Export !!!", "Info");
+            }
         }
 
         private void loginButton_Click(object sender, EventArgs e)
@@ -393,6 +455,26 @@ namespace BankTransactionManagement
             catch
             {
 
+            }
+
+        }
+
+        private void auditsButton_Click(object sender, EventArgs e)
+        {
+            if (companiesDataGridView.SelectedCells.Count > 0)
+            {
+                int selectedrowindex = companiesDataGridView.SelectedCells[0].RowIndex;
+                DataGridViewRow selectedRow = companiesDataGridView.Rows[selectedrowindex];
+                AuditLogForm auditLogForm = new AuditLogForm((selectedRow.DataBoundItem as Company),  securityTokenTextBox.Text);
+                auditLogForm.ShowDialog();
+                auditLogForm.Dispose();
+                
+                this.BringToFront();
+
+            }
+            else
+            {
+                MessageBox.Show("No companies have been selected.");
             }
 
         }

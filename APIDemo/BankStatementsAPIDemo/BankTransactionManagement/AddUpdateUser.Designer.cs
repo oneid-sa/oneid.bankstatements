@@ -29,20 +29,20 @@
         private void InitializeComponent()
         {
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.label1 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
-            this.label5 = new System.Windows.Forms.Label();
-            this.label6 = new System.Windows.Forms.Label();
-            this.passwordTextBox = new System.Windows.Forms.TextBox();
-            this.usernameTextBox = new System.Windows.Forms.TextBox();
-            this.emailTextBox = new System.Windows.Forms.TextBox();
-            this.addressTextBox = new System.Windows.Forms.TextBox();
-            this.companyNameTextBox = new System.Windows.Forms.TextBox();
-            this.loginButton = new System.Windows.Forms.Button();
-            this.cancelButton = new System.Windows.Forms.Button();
-            this.saveButton = new System.Windows.Forms.Button();
             this.button3 = new System.Windows.Forms.Button();
+            this.saveButton = new System.Windows.Forms.Button();
+            this.cancelButton = new System.Windows.Forms.Button();
+            this.loginButton = new System.Windows.Forms.Button();
+            this.companyNameTextBox = new System.Windows.Forms.TextBox();
+            this.addressTextBox = new System.Windows.Forms.TextBox();
+            this.emailTextBox = new System.Windows.Forms.TextBox();
+            this.usernameTextBox = new System.Windows.Forms.TextBox();
+            this.passwordTextBox = new System.Windows.Forms.TextBox();
+            this.label6 = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -70,110 +70,16 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Add / Update User";
             // 
-            // label1
+            // button3
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(23, 44);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(112, 17);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "Company Name:";
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(23, 151);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(73, 17);
-            this.label3.TabIndex = 2;
-            this.label3.Text = "Password:";
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(23, 122);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(77, 17);
-            this.label4.TabIndex = 3;
-            this.label4.Text = "Username:";
-            // 
-            // label5
-            // 
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(23, 96);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(46, 17);
-            this.label5.TabIndex = 4;
-            this.label5.Text = "Email:";
-            // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(23, 70);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(64, 17);
-            this.label6.TabIndex = 5;
-            this.label6.Text = "Address:";
-            // 
-            // passwordTextBox
-            // 
-            this.passwordTextBox.Location = new System.Drawing.Point(134, 150);
-            this.passwordTextBox.Name = "passwordTextBox";
-            this.passwordTextBox.Size = new System.Drawing.Size(260, 23);
-            this.passwordTextBox.TabIndex = 5;
-            // 
-            // usernameTextBox
-            // 
-            this.usernameTextBox.Location = new System.Drawing.Point(134, 124);
-            this.usernameTextBox.Name = "usernameTextBox";
-            this.usernameTextBox.Size = new System.Drawing.Size(260, 23);
-            this.usernameTextBox.TabIndex = 4;
-            // 
-            // emailTextBox
-            // 
-            this.emailTextBox.Location = new System.Drawing.Point(134, 98);
-            this.emailTextBox.Name = "emailTextBox";
-            this.emailTextBox.Size = new System.Drawing.Size(291, 23);
-            this.emailTextBox.TabIndex = 3;
-            // 
-            // addressTextBox
-            // 
-            this.addressTextBox.Location = new System.Drawing.Point(134, 70);
-            this.addressTextBox.Name = "addressTextBox";
-            this.addressTextBox.Size = new System.Drawing.Size(379, 23);
-            this.addressTextBox.TabIndex = 2;
-            // 
-            // companyNameTextBox
-            // 
-            this.companyNameTextBox.Location = new System.Drawing.Point(134, 44);
-            this.companyNameTextBox.Name = "companyNameTextBox";
-            this.companyNameTextBox.Size = new System.Drawing.Size(260, 23);
-            this.companyNameTextBox.TabIndex = 1;
-            this.companyNameTextBox.TextChanged += new System.EventHandler(this.textBox5_TextChanged);
-            // 
-            // loginButton
-            // 
-            this.loginButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(128)))));
-            this.loginButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.loginButton.Location = new System.Drawing.Point(244, 185);
-            this.loginButton.Name = "loginButton";
-            this.loginButton.Size = new System.Drawing.Size(103, 56);
-            this.loginButton.TabIndex = 14;
-            this.loginButton.Text = "Login";
-            this.loginButton.UseVisualStyleBackColor = false;
-            this.loginButton.Visible = false;
-            // 
-            // cancelButton
-            // 
-            this.cancelButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(128)))));
-            this.cancelButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.cancelButton.Location = new System.Drawing.Point(135, 185);
-            this.cancelButton.Name = "cancelButton";
-            this.cancelButton.Size = new System.Drawing.Size(103, 56);
-            this.cancelButton.TabIndex = 8;
-            this.cancelButton.Text = "Cancel";
-            this.cancelButton.UseVisualStyleBackColor = false;
-            this.cancelButton.Click += new System.EventHandler(this.cancelButton_Click);
+            this.button3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(128)))));
+            this.button3.Location = new System.Drawing.Point(398, 150);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(101, 32);
+            this.button3.TabIndex = 6;
+            this.button3.Text = "Generate";
+            this.button3.UseVisualStyleBackColor = false;
+            this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
             // saveButton
             // 
@@ -187,16 +93,115 @@
             this.saveButton.UseVisualStyleBackColor = false;
             this.saveButton.Click += new System.EventHandler(this.saveButton_Click);
             // 
-            // button3
+            // cancelButton
             // 
-            this.button3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(128)))));
-            this.button3.Location = new System.Drawing.Point(398, 150);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(101, 32);
-            this.button3.TabIndex = 6;
-            this.button3.Text = "Generate";
-            this.button3.UseVisualStyleBackColor = false;
-            this.button3.Click += new System.EventHandler(this.button3_Click);
+            this.cancelButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(128)))));
+            this.cancelButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.cancelButton.Location = new System.Drawing.Point(135, 185);
+            this.cancelButton.Name = "cancelButton";
+            this.cancelButton.Size = new System.Drawing.Size(103, 56);
+            this.cancelButton.TabIndex = 8;
+            this.cancelButton.Text = "Cancel";
+            this.cancelButton.UseVisualStyleBackColor = false;
+            this.cancelButton.Click += new System.EventHandler(this.cancelButton_Click);
+            // 
+            // loginButton
+            // 
+            this.loginButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(128)))));
+            this.loginButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.loginButton.Location = new System.Drawing.Point(244, 185);
+            this.loginButton.Name = "loginButton";
+            this.loginButton.Size = new System.Drawing.Size(103, 56);
+            this.loginButton.TabIndex = 14;
+            this.loginButton.Text = "Login";
+            this.loginButton.UseVisualStyleBackColor = false;
+            this.loginButton.Visible = false;
+            // 
+            // companyNameTextBox
+            // 
+            this.companyNameTextBox.Location = new System.Drawing.Point(134, 44);
+            this.companyNameTextBox.MaxLength = 145;
+            this.companyNameTextBox.Name = "companyNameTextBox";
+            this.companyNameTextBox.Size = new System.Drawing.Size(260, 23);
+            this.companyNameTextBox.TabIndex = 1;
+            this.companyNameTextBox.TextChanged += new System.EventHandler(this.textBox5_TextChanged);
+            // 
+            // addressTextBox
+            // 
+            this.addressTextBox.Location = new System.Drawing.Point(134, 70);
+            this.addressTextBox.MaxLength = 345;
+            this.addressTextBox.Name = "addressTextBox";
+            this.addressTextBox.Size = new System.Drawing.Size(379, 23);
+            this.addressTextBox.TabIndex = 2;
+            // 
+            // emailTextBox
+            // 
+            this.emailTextBox.Location = new System.Drawing.Point(134, 98);
+            this.emailTextBox.MaxLength = 145;
+            this.emailTextBox.Name = "emailTextBox";
+            this.emailTextBox.Size = new System.Drawing.Size(291, 23);
+            this.emailTextBox.TabIndex = 3;
+            // 
+            // usernameTextBox
+            // 
+            this.usernameTextBox.Location = new System.Drawing.Point(134, 124);
+            this.usernameTextBox.MaxLength = 145;
+            this.usernameTextBox.Name = "usernameTextBox";
+            this.usernameTextBox.Size = new System.Drawing.Size(260, 23);
+            this.usernameTextBox.TabIndex = 4;
+            // 
+            // passwordTextBox
+            // 
+            this.passwordTextBox.Location = new System.Drawing.Point(134, 150);
+            this.passwordTextBox.MaxLength = 245;
+            this.passwordTextBox.Name = "passwordTextBox";
+            this.passwordTextBox.Size = new System.Drawing.Size(260, 23);
+            this.passwordTextBox.TabIndex = 5;
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(23, 70);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(64, 17);
+            this.label6.TabIndex = 5;
+            this.label6.Text = "Address:";
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(23, 96);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(46, 17);
+            this.label5.TabIndex = 4;
+            this.label5.Text = "Email:";
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(23, 122);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(77, 17);
+            this.label4.TabIndex = 3;
+            this.label4.Text = "Username:";
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(23, 151);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(73, 17);
+            this.label3.TabIndex = 2;
+            this.label3.Text = "Password:";
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(23, 44);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(112, 17);
+            this.label1.TabIndex = 0;
+            this.label1.Text = "Company Name:";
             // 
             // AddUpdateUser
             // 

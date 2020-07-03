@@ -55,6 +55,12 @@
     <Compile Include="AddUpdateUser.Designer.cs">
       <DependentUpon>AddUpdateUser.cs</DependentUpon>
     </Compile>
+    <Compile Include="AuditLogForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AuditLogForm.Designer.cs">
+      <DependentUpon>AuditLogForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Mainform.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -67,6 +73,10 @@
     <Compile Include="MessageForm.Designer.cs">
       <DependentUpon>MessageForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="models\AuditList.cs" />
+    <Compile Include="models\AuditListResponse.cs" />
+    <Compile Include="models\AuditRequest.cs" />
+    <Compile Include="models\AuditResponse.cs" />
     <Compile Include="models\BaseClass.cs" />
     <Compile Include="models\Company.cs" />
     <Compile Include="models\CompanyCreateRequest.cs" />
@@ -83,6 +93,9 @@
     <Compile Include="RESTManager.cs" />
     <EmbeddedResource Include="AddUpdateUser.resx">
       <DependentUpon>AddUpdateUser.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="AuditLogForm.resx">
+      <DependentUpon>AuditLogForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Mainform.resx">
       <DependentUpon>Mainform.cs</DependentUpon>

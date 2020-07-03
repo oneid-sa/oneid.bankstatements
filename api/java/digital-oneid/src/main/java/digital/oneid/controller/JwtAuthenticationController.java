@@ -589,7 +589,7 @@ public class JwtAuthenticationController extends Constants {
                             String cobrandName = jwtBusinessService.getCobrandName();
                             YodleeJwtTokenGenerate tokenYodleeGenerator = new YodleeJwtTokenGenerate(args);
                             String yodleeUserToken = tokenYodleeGenerator.generateJwtYodlee(false, jwtBusinessService.getCompanySpecificAccountholderId(AccountTransactionsRequestValue.getAccountHolderIdentifier()));
-                            jwtBusinessService.AuditLogging(companyId, ROLE_COMPANY, request.getRemoteAddr(), AUDIT_USER_TRANSACTION + "/" + AccountTransactionsRequestValue.getAccountHolderIdentifier() + "/"+ AccountTransactionsRequestValue.getAccountHolderIdentifier() + "/" + AccountTransactionsRequestValue.getAccountid() + "/" + SUCCESS);
+                            jwtBusinessService.AuditLogging(companyId, ROLE_COMPANY, request.getRemoteAddr(), AUDIT_USER_TRANSACTION + "/" + AccountTransactionsRequestValue.getAccountHolderIdentifier() + "/"+ AccountTransactionsRequestValue.getUniqueReference() + "/" + AccountTransactionsRequestValue.getAccountid() + "/" + SUCCESS);
                             CobrandLoginResponse cobrandSessionTokenInfo = getCobrandSessionToken();
                             UserUnregisterRequest userUnregisterRequest = new UserUnregisterRequest();
                             userUnregisterRequest.setAccountHolderIdentifier(AccountTransactionsRequestValue.getAccountHolderIdentifier());
